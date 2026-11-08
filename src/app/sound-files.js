@@ -1,0 +1,25 @@
+// Las grabaciones del juego (assets/audio/sfx/, CC0 de Freesound; tools/audio/). Cada una con su ruta
+// fija, para que el build sepa exactamente qué archivos llevar.
+export const SOUND_FILES = {
+  'mg7-disparo': new URL('../../assets/audio/sfx/mg7-disparo.mp3', import.meta.url).href,
+  'mg7-gatling': new URL('../../assets/audio/sfx/mg7-gatling.mp3', import.meta.url).href,
+  'enemigo-fusil': new URL('../../assets/audio/sfx/enemigo-fusil.mp3', import.meta.url).href,
+  'canon-automatico': new URL('../../assets/audio/sfx/canon-automatico.mp3', import.meta.url).href,
+  'tanque-canon': new URL('../../assets/audio/sfx/tanque-canon.mp3', import.meta.url).href,
+  'misil-lanzamiento': new URL('../../assets/audio/sfx/misil-lanzamiento.mp3', import.meta.url).href,
+  'cohete-salva': new URL('../../assets/audio/sfx/cohete-salva.mp3', import.meta.url).href,
+  'rpg-disparo': new URL('../../assets/audio/sfx/rpg-disparo.mp3', import.meta.url).href,
+  interceptor: new URL('../../assets/audio/sfx/interceptor.mp3', import.meta.url).href,
+  'explosion-grande': new URL('../../assets/audio/sfx/explosion-grande.mp3', import.meta.url).href,
+  'explosion-media': new URL('../../assets/audio/sfx/explosion-media.mp3', import.meta.url).href,
+  'explosion-lejana': new URL('../../assets/audio/sfx/explosion-lejana.mp3', import.meta.url).href,
+  'impacto-blindaje': new URL('../../assets/audio/sfx/impacto-blindaje.mp3', import.meta.url).href,
+  'soldado-cae': new URL('../../assets/audio/sfx/soldado-cae.mp3', import.meta.url).href,
+  fuego: new URL('../../assets/audio/sfx/fuego.mp3', import.meta.url).href,
+  'moto-motor': new URL('../../assets/audio/sfx/moto-motor.mp3', import.meta.url).href,
+  'patrulla-motor': new URL('../../assets/audio/sfx/patrulla-motor.mp3', import.meta.url).href,
+  'blindado-motor': new URL('../../assets/audio/sfx/blindado-motor.mp3', import.meta.url).href,
+  orugas: new URL('../../assets/audio/sfx/orugas.mp3', import.meta.url).href,
+  'dron-fpv': new URL('../../assets/audio/sfx/dron-fpv.mp3', import.meta.url).href,
+  'dron-ala': new URL('../../assets/audio/sfx/dron-ala.mp3', import.meta.url).href,
+};

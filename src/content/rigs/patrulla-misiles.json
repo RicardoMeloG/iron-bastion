@@ -1,0 +1,29 @@
+{
+  "id": "patrulla-misiles",
+  "source": "tools/asset-pipeline/blender/patrulla.py",
+  "hullLength": 1,
+  "hitRadius": 0.5,
+  "height": 0.602,
+  "turretPivot": [
+    0,
+    0.402,
+    -0.03
+  ],
+  "gunPivot": [
+    0,
+    0.502,
+    0.02
+  ],
+  "muzzles": [
+    [
+      -0.047,
+      0.532,
+      0.22
+    ],
+    [
+      0.047,
+      0.532,
+      0.22
+    ]
+  ]
+}

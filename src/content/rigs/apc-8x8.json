@@ -1,0 +1,24 @@
+{
+  "id": "apc-8x8",
+  "source": "tools/asset-pipeline/blender/vehiculos.py",
+  "hullLength": 1.02,
+  "hitRadius": 0.51,
+  "height": 0.55,
+  "turretPivot": [
+    0,
+    0.31,
+    -0.05
+  ],
+  "gunPivot": [
+    0,
+    0.35,
+    0.07
+  ],
+  "muzzles": [
+    [
+      0,
+      0.35,
+      0.415
+    ]
+  ]
+}

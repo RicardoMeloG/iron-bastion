@@ -1,0 +1,19 @@
+{
+  "id": "dron-ala",
+  "source": "assets/source/dron-ala.glb",
+  "publish": true,
+  "note": "Dron de ala delta, de diseño ficticio, generado con TRELLIS.2 en local desde su concepto. Sin arma: va en una pieza. La nariz mira a -z.",
+  "forward": "-z",
+  "up": "+y",
+  "style": {
+    "simplify": 0.08,
+    "simplifyError": 0.003,
+    "brightness": 1.25,
+    "keepColorBorders": true,
+    "palette": [
+      "arena",
+      "metal",
+      "metalOscuro"
+    ]
+  }
+}

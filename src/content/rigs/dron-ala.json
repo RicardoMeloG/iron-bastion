@@ -1,0 +1,7 @@
+{
+  "id": "dron-ala",
+  "source": "assets/source/dron-ala.glb",
+  "hullLength": 1,
+  "hitRadius": 0.5,
+  "height": 0.196
+}

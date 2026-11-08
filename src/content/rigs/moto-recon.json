@@ -1,0 +1,7 @@
+{
+  "id": "moto-recon",
+  "source": "tools/asset-pipeline/blender/moto.py",
+  "hullLength": 0.9954,
+  "hitRadius": 0.4977,
+  "height": 0.754
+}

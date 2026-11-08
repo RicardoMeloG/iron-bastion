@@ -1,0 +1,44 @@
+{
+  "id": "lm2-lanza-n4",
+  "source": "tools/asset-pipeline/blender/torres.py",
+  "hullLength": 1,
+  "hitRadius": 0.5,
+  "height": 0.657,
+  "turretPivot": [
+    0,
+    0.335,
+    0
+  ],
+  "gunPivot": [
+    0,
+    0.505,
+    0
+  ],
+  "muzzles": [
+    [
+      -0.235,
+      0.417,
+      0.2
+    ],
+    [
+      -0.235,
+      0.505,
+      0.2
+    ],
+    [
+      -0.235,
+      0.593,
+      0.2
+    ],
+    [
+      0.235,
+      0.461,
+      0.2
+    ],
+    [
+      0.235,
+      0.549,
+      0.2
+    ]
+  ]
+}

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iron Bastion - Vehicle Lab</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      color: #e2e8f0;
+      background:
+        radial-gradient(circle at 18% 16%, rgba(127, 186, 255, 0.17), transparent 26%),
+        radial-gradient(circle at 82% 18%, rgba(146, 255, 180, 0.11), transparent 24%),
+        linear-gradient(180deg, #0f1a26 0%, #080f17 100%);
+    }
+    #lab {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(420px, 1fr) 370px;
+      gap: 24px;
+      padding: 24px;
+    }
+    #viewer-card,
+    #control-card {
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(14, 24, 36, 0.96), rgba(8, 15, 24, 0.96));
+      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.32);
+      overflow: hidden;
+    }
+    #viewer-header,
+    #control-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #7dd3fc;
+      font-weight: 800;
+    }
+    h1, h2 {
+      margin-top: 8px;
+      font-size: 27px;
+      font-weight: 900;
+      color: #f8fafc;
+    }
+    p {
+      margin-top: 8px;
+      color: #94a3b8;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    #viewer {
+      height: calc(100vh - 118px);
+      min-height: 560px;
+      cursor: grab;
+    }
+    #viewer.dragging {
+      cursor: grabbing;
+    }
+    #control-card {
+      display: flex;
+      flex-direction: column;
+    }
+    #controls {
+      padding: 18px 22px 24px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+    label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: #d5dfeb;
+      margin-bottom: 7px;
+      font-weight: 800;
+    }
+    select, button {
+      width: 100%;
+      border-radius: 11px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: #101b28;
+      color: #f8fafc;
+      font-size: 14px;
+      padding: 11px 12px;
+    }
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(180deg, #39495e 0%, #2a3546 100%);
+      border-color: rgba(148, 163, 184, 0.24);
+    }
+    #stats {
+      margin-top: 2px;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      background: rgba(30, 41, 59, 0.38);
+      padding: 12px 14px;
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .stat-label {
+      color: #9fb1c7;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .stat-value {
+      color: #f8fafc;
+      font-weight: 800;
+      text-align: right;
+    }
+    #status {
+      color: #facc15;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+    @media (max-width: 1100px) {
+      #lab {
+        grid-template-columns: 1fr;
+      }
+      #viewer {
+        height: 62vh;
+        min-height: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="lab">
+    <section id="viewer-card">
+      <div id="viewer-header">
+        <div class="eyebrow">Vehicle Viewer</div>
+        <h1>Vehicle Lab</h1>
+        <p>Vista grande para revisar presets de vehiculos reales y validar assets antes de integrarlos al juego.</p>
+      </div>
+      <div id="viewer"></div>
+    </section>
+    <aside id="control-card">
+      <div id="control-header">
+        <div class="eyebrow">Configuracion</div>
+        <h2>Visor</h2>
+        <p>Arrastra con mouse para rotar camara, rueda para zoom y cambia entre presets reales.</p>
+        <div id="status">Cargando...</div>
+      </div>
+      <div id="controls">
+        <div>
+          <label for="preset-select">Preset</label>
+          <select id="preset-select"></select>
+        </div>
+        <button id="random-btn" type="button">Preset aleatorio</button>
+        <div id="stats"></div>
+      </div>
+    </aside>
+  </div>
+  <script type="module" src="/tools/labs/vehicle-lab.js"></script>
+</body>
+</html>

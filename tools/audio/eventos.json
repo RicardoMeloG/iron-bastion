@@ -1,0 +1,298 @@
+{
+  "nota": "Qué sonido necesita cada cosa del juego y cómo buscarlo en Freesound (solo CC0). `duracion` en segundos: [mínimo, máximo]. `bucle`: se repite mientras dure (motores).",
+  "eventos": [
+    {
+      "id": "mg7-disparo",
+      "nombre": "MG-7: disparo de ametralladora pesada",
+      "busquedas": [
+        "heavy machine gun shot",
+        "machine gun burst",
+        "50 cal",
+        "m2 browning",
+        "gunshot heavy",
+        "machine gun short burst"
+      ],
+      "duracion": [
+        0.1,
+        3
+      ]
+    },
+    {
+      "id": "mg7-gatling",
+      "nombre": "MG-7 nivel 5: ráfaga de gatling",
+      "busquedas": [
+        "minigun",
+        "gatling gun burst"
+      ],
+      "duracion": [
+        0.5,
+        6
+      ]
+    },
+    {
+      "id": "enemigo-fusil",
+      "nombre": "Soldados y patrulla: disparo de fusil o ametralladora ligera",
+      "busquedas": [
+        "assault rifle shot",
+        "rifle gunshot",
+        "ak47 shot"
+      ],
+      "duracion": [
+        0.1,
+        1.5
+      ]
+    },
+    {
+      "id": "canon-automatico",
+      "nombre": "8x8 y AA-3: cañón automático",
+      "busquedas": [
+        "autocannon",
+        "anti aircraft gun",
+        "20mm cannon"
+      ],
+      "duracion": [
+        0.1,
+        3
+      ]
+    },
+    {
+      "id": "tanque-canon",
+      "nombre": "Tanque: cañonazo",
+      "busquedas": [
+        "tank cannon shot",
+        "artillery cannon fire",
+        "howitzer shot"
+      ],
+      "duracion": [
+        0.5,
+        5
+      ]
+    },
+    {
+      "id": "misil-lanzamiento",
+      "nombre": "LM-2: lanzamiento de misil",
+      "busquedas": [
+        "missile launch",
+        "rocket launch whoosh",
+        "anti tank missile"
+      ],
+      "duracion": [
+        0.5,
+        4
+      ]
+    },
+    {
+      "id": "cohete-salva",
+      "nombre": "RK-40: salva de cohetes",
+      "busquedas": [
+        "rocket artillery",
+        "multiple rocket launcher",
+        "katyusha"
+      ],
+      "duracion": [
+        0.5,
+        6
+      ]
+    },
+    {
+      "id": "rpg-disparo",
+      "nombre": "Soldado y patrulla: disparo de RPG",
+      "busquedas": [
+        "rpg launch",
+        "rocket launcher shot",
+        "bazooka",
+        "rocket whoosh",
+        "missile whoosh",
+        "launcher fire"
+      ],
+      "duracion": [
+        0.3,
+        3
+      ]
+    },
+    {
+      "id": "interceptor",
+      "nombre": "Defensa activa del tanque: interceptor",
+      "busquedas": [
+        "small rocket launch",
+        "firework launch whoosh",
+        "flare gun shot",
+        "whoosh fast",
+        "rocket whoosh",
+        "missile pass by"
+      ],
+      "duracion": [
+        0.1,
+        2
+      ]
+    },
+    {
+      "id": "explosion-grande",
+      "nombre": "Vehículo pesado destruido: explosión grande",
+      "busquedas": [
+        "big explosion",
+        "large explosion debris",
+        "vehicle explosion"
+      ],
+      "duracion": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "explosion-media",
+      "nombre": "Misil o proyectil que estalla",
+      "busquedas": [
+        "explosion medium",
+        "grenade explosion",
+        "missile impact explosion"
+      ],
+      "duracion": [
+        0.5,
+        5
+      ]
+    },
+    {
+      "id": "explosion-lejana",
+      "nombre": "Explosiones lejanas (ambiente)",
+      "busquedas": [
+        "distant explosion",
+        "distant artillery",
+        "far explosion rumble"
+      ],
+      "duracion": [
+        1,
+        10
+      ]
+    },
+    {
+      "id": "impacto-blindaje",
+      "nombre": "Bala que pega en blindaje",
+      "busquedas": [
+        "bullet impact metal",
+        "ricochet",
+        "bullet hit armor"
+      ],
+      "duracion": [
+        0.05,
+        1.5
+      ]
+    },
+    {
+      "id": "fuego",
+      "nombre": "Fuego incendiario de la RK-40",
+      "busquedas": [
+        "fire crackling loop",
+        "napalm fire",
+        "burning fire"
+      ],
+      "duracion": [
+        3,
+        30
+      ],
+      "bucle": true
+    },
+    {
+      "id": "moto-motor",
+      "nombre": "Moto: motor",
+      "busquedas": [
+        "motorcycle engine loop",
+        "dirt bike engine",
+        "motorbike idle"
+      ],
+      "duracion": [
+        2,
+        30
+      ],
+      "bucle": true
+    },
+    {
+      "id": "patrulla-motor",
+      "nombre": "Patrulla y camión: motor diésel",
+      "busquedas": [
+        "diesel engine loop",
+        "truck engine idle",
+        "suv engine running"
+      ],
+      "duracion": [
+        2,
+        30
+      ],
+      "bucle": true
+    },
+    {
+      "id": "blindado-motor",
+      "nombre": "8x8 y tanque: motor pesado",
+      "busquedas": [
+        "tank engine",
+        "armored vehicle engine",
+        "heavy diesel engine rumble"
+      ],
+      "duracion": [
+        2,
+        30
+      ],
+      "bucle": true
+    },
+    {
+      "id": "orugas",
+      "nombre": "Tanque: orugas",
+      "busquedas": [
+        "tank tracks",
+        "tracked vehicle",
+        "tank movement squeak"
+      ],
+      "duracion": [
+        2,
+        30
+      ],
+      "bucle": true
+    },
+    {
+      "id": "dron-fpv",
+      "nombre": "Dron FPV: zumbido de hélices",
+      "busquedas": [
+        "fpv drone",
+        "quadcopter drone",
+        "drone propeller buzz"
+      ],
+      "duracion": [
+        2,
+        30
+      ],
+      "bucle": true
+    },
+    {
+      "id": "dron-ala",
+      "nombre": "Dron de ala delta: motor de dos tiempos que zumba (como un cortacésped o una motoneta volando)",
+      "busquedas": [
+        "lawn mower engine",
+        "lawnmower running",
+        "moped pass by",
+        "two stroke engine",
+        "rc plane gas engine",
+        "model airplane engine flyby",
+        "ultralight aircraft engine",
+        "scooter engine"
+      ],
+      "duracion": [
+        2,
+        30
+      ],
+      "bucle": true
+    },
+    {
+      "id": "soldado-cae",
+      "nombre": "Soldado que cae",
+      "busquedas": [
+        "man grunt death",
+        "male pain grunt",
+        "body fall"
+      ],
+      "duracion": [
+        0.2,
+        2
+      ]
+    }
+  ]
+}

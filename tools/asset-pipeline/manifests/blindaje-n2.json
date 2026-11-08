@@ -1,0 +1,15 @@
+{
+  "id": "blindaje-n2",
+  "source": "assets/source/blindaje-n2.glb",
+  "publish": true,
+  "note": "Fortificación del blindaje, hecha por código (tools/asset-pipeline/make-blindaje.mjs). Va en el suelo alrededor de cualquier torre.",
+  "forward": "+z",
+  "up": "+y",
+  "style": {
+    "materials": {
+      "saco": "arena",
+      "hormigon": "metal",
+      "placa": "metalOscuro"
+    }
+  }
+}

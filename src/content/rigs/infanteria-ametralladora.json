@@ -1,0 +1,24 @@
+{
+  "id": "infanteria-ametralladora",
+  "source": "tools/asset-pipeline/blender/soldado.py",
+  "hullLength": 1,
+  "hitRadius": 1.24,
+  "height": 3.5,
+  "turretPivot": [
+    0,
+    1.72,
+    0
+  ],
+  "gunPivot": [
+    0,
+    2.68,
+    0
+  ],
+  "muzzles": [
+    [
+      0.24,
+      2.48,
+      1.84
+    ]
+  ]
+}

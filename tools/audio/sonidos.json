@@ -1,0 +1,26 @@
+{
+  "nota": "Cómo se procesa cada sonido del juego desde su grabación elegida (tools/audio/seleccion.json, ids de Freesound, CC0). `evento`: de qué elección sale. `bucle`: largo del bucle en segundos; si no, es un disparo y `max` es su largo máximo, con cierre suave. `tono`: velocidad de reproducción (1,25 es más agudo y corto). `eco`: le agrega una cola corta (para una bala sacada de una ráfaga). Salida en assets/audio/sfx/.",
+  "sonidos": {
+    "mg7-disparo": { "evento": "mg7-disparo", "max": 0.105, "eco": true },
+    "mg7-gatling": { "evento": "mg7-gatling", "max": 2.3 },
+    "enemigo-fusil": { "evento": "enemigo-fusil", "max": 0.6 },
+    "canon-automatico": { "evento": "canon-automatico", "max": 1.2 },
+    "tanque-canon": { "evento": "tanque-canon", "max": 2.5 },
+    "misil-lanzamiento": { "evento": "misil-lanzamiento", "max": 1.6 },
+    "cohete-salva": { "evento": "cohete-salva", "max": 2.2 },
+    "rpg-disparo": { "evento": "rpg-disparo", "max": 1.2, "tono": 1.3 },
+    "interceptor": { "evento": "interceptor", "max": 0.55, "tono": 1.6 },
+    "explosion-grande": { "evento": "explosion-grande", "max": 4 },
+    "explosion-media": { "evento": "explosion-media", "max": 1.9 },
+    "explosion-lejana": { "evento": "explosion-lejana", "max": 4.4 },
+    "impacto-blindaje": { "evento": "impacto-blindaje", "max": 0.8 },
+    "soldado-cae": { "evento": "soldado-cae", "max": 1.4 },
+    "fuego": { "evento": "fuego", "bucle": 6 },
+    "moto-motor": { "evento": "moto-motor", "bucle": 3 },
+    "patrulla-motor": { "evento": "patrulla-motor", "bucle": 2 },
+    "blindado-motor": { "evento": "blindado-motor", "bucle": 3.5 },
+    "orugas": { "evento": "orugas", "bucle": 4 },
+    "dron-fpv": { "evento": "dron-fpv", "bucle": 3 },
+    "dron-ala": { "evento": "dron-ala", "bucle": 3 }
+  }
+}

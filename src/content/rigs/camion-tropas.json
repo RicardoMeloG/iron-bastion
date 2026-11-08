@@ -1,0 +1,7 @@
+{
+  "id": "camion-tropas",
+  "source": "tools/asset-pipeline/blender/vehiculos.py",
+  "hullLength": 1.008,
+  "hitRadius": 0.504,
+  "height": 0.556
+}

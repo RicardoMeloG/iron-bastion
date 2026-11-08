@@ -1,0 +1,7 @@
+{
+  "id": "blindaje-n2",
+  "source": "assets/source/blindaje-n2.glb",
+  "hullLength": 1,
+  "hitRadius": 0.5,
+  "height": 0.142
+}

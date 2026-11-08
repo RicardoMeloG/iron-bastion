@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>Iron Bastion - Visor de rigs</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; background: #0f172a; color: #e2e8f0; font: 14px system-ui, sans-serif; overflow: hidden; }
+    #panel { position: absolute; top: 12px; left: 12px; background: #1e293bdd; border: 1px solid #334155; border-radius: 8px; padding: 12px 14px; max-width: 340px; }
+    #panel h1 { font-size: 15px; margin: 0 0 8px; }
+    #panel label { display: block; margin: 6px 0; }
+    #panel select, #panel input { margin-left: 6px; }
+    #info { font: 12px ui-monospace, monospace; white-space: pre; margin-top: 8px; color: #94a3b8; }
+    .legend span { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div id="panel">
+    <h1>Visor de rigs (ADR 001)</h1>
+    <label>Modelo <select id="model"></select></label>
+    <label><input type="checkbox" id="animate" checked /> Animar torreta y cañón</label>
+    <div class="legend">
+      <div><span style="background:#ef4444"></span>Dirección del cañón (+Z de cada boca)</div>
+      <div><span style="background:#facc15"></span>Pivote de la torreta</div>
+      <div><span style="background:#22d3ee"></span>Pivote del cañón</div>
+      <div><span style="background:#a3e635"></span>Frente del vehículo (+Z)</div>
+    </div>
+    <div id="info"></div>
+  </div>
+  <script type="module" src="/tools/labs/rig-viewer.js"></script>
+</body>
+</html>

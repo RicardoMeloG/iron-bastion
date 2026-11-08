@@ -1,0 +1,7 @@
+{
+  "id": "dron-fpv",
+  "source": "assets/source/dron-fpv.glb",
+  "hullLength": 0.9992,
+  "hitRadius": 0.5459,
+  "height": 0.3556
+}

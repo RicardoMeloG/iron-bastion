@@ -1,0 +1,29 @@
+{
+  "id": "moto-recon-n3",
+  "source": "tools/asset-pipeline/blender/moto.py",
+  "hullLength": 0.9954,
+  "hitRadius": 0.4977,
+  "height": 0.754,
+  "turretPivot": [
+    0,
+    0.44,
+    -0.165
+  ],
+  "gunPivot": [
+    0,
+    0.645,
+    -0.15
+  ],
+  "muzzles": [
+    [
+      -0.052,
+      0.655,
+      0.14
+    ],
+    [
+      0.052,
+      0.655,
+      0.14
+    ]
+  ]
+}

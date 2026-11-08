@@ -1,0 +1,7 @@
+{
+  "id": "patrulla",
+  "source": "tools/asset-pipeline/blender/patrulla.py",
+  "hullLength": 1,
+  "hitRadius": 0.5,
+  "height": 0.602
+}

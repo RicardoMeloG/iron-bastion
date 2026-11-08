@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iron Bastion - Tower Defense</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/src/ui/styles.css" />
+</head>
+<body>
+  <div id="game-container">
+    <div id="viewport">
+      <div id="field"><div id="tower-quick" hidden></div><div id="rock-quick" hidden></div></div>
+      <div id="hud">
+        <div class="hud-bevel"><span id="wave-countdown" title="Segundos para la siguiente oleada" hidden>30</span></div>
+        <div>
+          <div>
+            <span class="hud-stat"><svg class="hud-icon" viewBox="0 0 20 20"><ellipse cx="10" cy="14.5" rx="7" ry="3" fill="#b8860b"/><ellipse cx="10" cy="10.5" rx="7" ry="3" fill="#d9a514"/><ellipse cx="10" cy="6.5" rx="7" ry="3" fill="#facc15"/></svg>Créditos <span class="hud-val" id="credits">250</span></span>
+            <span class="hud-stat"><svg class="hud-icon" viewBox="0 0 20 20" fill="none" stroke="#dbe5ef" stroke-width="1.8" stroke-linecap="round"><path d="M2 6c3-3 5 3 8 0s5 3 8 0M2 11c3-3 5 3 8 0s5 3 8 0M2 16c3-3 5 3 8 0s5 3 8 0"/></svg>Oleada <span class="hud-val" id="wave">0</span>/<span id="wave-total"></span></span>
+            <span class="hud-stat"><svg class="hud-icon" viewBox="0 0 20 20" fill="#dbe5ef"><path d="M10 2c-4.2 0-7 2.9-7 6.6 0 2.4 1.1 4 2.8 5v2.2c0 .6.5 1.2 1.2 1.2h6c.7 0 1.2-.6 1.2-1.2v-2.2c1.7-1 2.8-2.6 2.8-5C17 4.9 14.200 2 10 2z"/><circle cx="7" cy="9" r="1.9" fill="#0d1a2b"/><circle cx="13" cy="9" r="1.9" fill="#0d1a2b"/></svg>Enemigos <span class="hud-val" id="enemy-count">0</span></span>
+          </div>
+          <div id="life-bar-wrap">
+            <div id="life-bar-outer"><div id="life-bar-fill"></div></div>
+          </div>
+        </div>
+        <div class="hud-actions">
+          <button class="hud-btn" id="mute-btn" type="button" aria-pressed="false" title="Silenciar o activar el sonido (M)">Sonido: sí</button>
+          <button class="hud-btn" id="pause-btn" type="button" aria-pressed="false" title="Pausar o continuar (P)">Pausa</button>
+          <button class="hud-btn" id="speed-btn" type="button" title="Acelerar la partida (V)">Velocidad: x1</button>
+          <button class="hud-btn" id="help-btn" type="button">Ayuda</button>
+          <button class="hud-btn hud-btn-reset" id="reset-wave-btn" type="button" onclick="window.askResetWave()" disabled>Reiniciar oleada</button>
+          <button class="hud-btn hud-btn-reset" id="reset-all-btn" type="button" onclick="window.askResetAll()">Reiniciar todo</button>
+        </div>
+      </div>
+
+      <aside id="side-right" aria-label="Partida">
+      <div id="dev-controls">
+        <label class="dev-toggle">
+          <input type="checkbox" id="dev-mode-toggle" />
+          <span>Modo Desarrollo</span>
+        </label>
+        <div id="dev-config" hidden>
+          <div class="dev-help">Dinero infinito. Elige vehículos y veteranía para la siguiente oleada; sin vehículos, sale la oleada normal.</div>
+          <div class="dev-field">
+            <span>Cantidad</span>
+            <input id="dev-wave-count" type="number" min="1" max="200" value="16" />
+          </div>
+          <div class="dev-field">
+            <span>Intervalo (s)</span>
+            <input id="dev-wave-interval" type="number" min="0.1" max="5" step="0.05" value="0.72" />
+          </div>
+          <div class="dev-actions">
+            <button id="dev-select-all" type="button">Todos</button>
+            <button id="dev-clear-all" type="button">Ninguno</button>
+          </div>
+          <div id="dev-enemy-list"></div>
+          <div class="dev-label">Veteranía</div>
+          <div id="dev-veterancy" role="radiogroup" aria-label="Veteranía"></div>
+        </div>
+      </div>
+
+      <section id="next-wave" aria-label="Oleada"></section>
+      <button id="wave-btn" onclick="window.startWave()">▶ Oleada 1</button>
+      </aside>
+
+      <aside id="side-left">
+        <div class="side-title"><svg class="side-title-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M4 3h3v2.500h2.500V3h5v2.500H17V3h3v6l-2.500 2v7l2 2v2h-15v-2l2-2v-7L4 9z"/></svg>CONSTRUIR</div>
+        <div id="tower-selector" class="tower-selector" aria-label="Torres"></div>
+      </aside>
+
+      <div id="tip">Clic: colocar · 1 a 4: elegir torre · Clic en torre: mejorar · Clic en roca o árbol: sacarlo · Rueda: zoom · Botón derecho: mover · Botón central: girar · M: sonido · P: pausa</div>
+
+      <div id="pause-banner" hidden>Pausa · P para continuar</div>
+
+      <div id="overlay">
+        <h2 id="overlay-title"></h2>
+        <p id="overlay-text"></p>
+        <button id="overlay-retry" style="background:#22C55E" onclick="window.resetWave()">Reintentar la oleada</button>
+        <button style="background:#3B82F6" onclick="window.resetAll()">Jugar de nuevo</button>
+      </div>
+
+      <div id="start-screen" class="show" role="dialog" aria-labelledby="start-title">
+        <div class="start-box">
+          <h1 id="start-title">Iron Bastion</h1>
+          <p class="start-lead">Primero llega la infantería, después las motos, los Humvees, los camiones de tropas, los blindados 8x8 y los tanques, cada vez en mayor número. Detenlos durante diez oleadas: empiezas con dinero para una sola torre.</p>
+          <ul class="start-howto">
+            <li><b>Clic en una celda libre</b>: pone la torre marcada en dorado a la izquierda (teclas <b>1</b> a <b>4</b>).</li>
+            <li><b>MG-7</b> ($60): ametralladora contra infantería y vehículos ligeros. <b>LM-2</b> ($150): misil guiado contra blindados. <b>RK-40</b> ($140): cohetes incendiarios contra soldados y motos, no alcanza de cerca. <b>AA-3</b> ($110): antiaérea, solo contra drones.</li>
+            <li><b>Drones</b>: el FPV estalla en la torre más cercana y el dron de ala delta va a tu base. Solo les disparan la AA-3 y, con poco acierto, la MG-7.</li>
+            <li><b>Evolucionar</b> una torre rinde más que poner varias básicas, y le suma vida.</li>
+            <li><b>Soldados</b>: andan en unidades de 3, que valen 1 vida aunque llegue uno solo. Cada nivel de veteranía cambia una ametralladora por un lanzamisiles, y en combate lanzan granadas. Salen de la niebla: al principio por el centro de ese borde y después por cualquier punto de él. Cruzan el campo hacia tu base, sin usar el camino, y le disparan a la torre que les cierre el paso. En las últimas oleadas llegan en grupos, y quienes bajan de un vehículo llevan un escudo azul: por un instante no reciben fuego. <b>Motos</b>: esquivan la mayoría de los misiles. De motos, camiones y 8x8 destruidos bajan soldados; si llegan a tu base, quitan una vida por cada soldado que traen.</li>
+            <li><b>Cobertura</b>: en la calle un soldado queda expuesto (escudo rojo roto) y muere de un disparo. En el pasto esquiva algunas balas, pero si le pegan, muere igual. Tras una roca, un árbol o un arbusto (escudo azul), parte de los disparos, también misiles, le pega a la cobertura y él ya no muere de un disparo. Cuerpo a tierra suma un nivel: tras una cobertura esquiva todavía más (escudo dorado), pero se arrastra más lento. Los veteranos se tiran al suelo al primer disparo, y quienes bajan de un vehículo empiezan así. El lanzamisiles se dispara solo de rodilla, sin la cobertura del suelo. El napalm ignora toda cobertura.</li>
+            <li><b>Roca, árbol y arbusto</b>: de más a menos resistente y protección. La ametralladora casi no daña una roca; un misil, sí. Lo que cae deja libre la celda. Se sacan con clic: roca $50, árbol $30. Una torre aplasta el arbusto.</li>
+            <li><b>Clic en una torre</b>: abre su panel para mejorar su ataque o su blindaje, o venderla. <b>Esc</b> lo cierra.</li>
+            <li><b>La siguiente oleada</b> sale sola cuando los segundos de arriba llegan a cero, con un aviso al final; el botón la adelanta. Puedes construir, mejorar y vender también durante la oleada.</li>
+            <li><b>Antes de que salga la oleada</b>, vender devuelve todo lo que gastaste en esa torre desde la oleada anterior; por si la pusiste mal.</li>
+            <li><b>Rueda</b>: zoom · <b>botón derecho</b>: mover el mapa · <b>botón central</b>: girarlo · <b>M</b>: sonido · <b>P</b>: pausa · <b>V</b>: velocidad.</li>
+          </ul>
+          <button id="start-btn" type="button">Jugar</button>
+          <label id="registro-consent" class="start-consent" hidden>
+            <input type="checkbox" id="registro-consent-check" />
+            Compartir el registro de mis partidas (compras, oleadas, daño y tiempos; sin datos personales) para ajustar la dificultad.
+          </label>
+          <details class="start-credits">
+            <summary>Créditos</summary>
+            <p>Todos los modelos 3D son diseños propios. Las torres, los vehículos y los soldados están modelados por código en <a href="https://www.blender.org/" target="_blank" rel="noopener">Blender</a>; los drones y los restos destruidos, generados con <a href="https://github.com/microsoft/TRELLIS.2" target="_blank" rel="noopener">TRELLIS.2</a> (MIT) desde imágenes de concepto hechas con IA.</p>
+            <p>Sonidos: grabaciones de <a href="https://freesound.org/" target="_blank" rel="noopener">Freesound</a> en dominio público (CC0).</p>
+            <p>El mapa, los efectos, los sonidos de motor y orugas y el código son del proyecto.</p>
+          </details>
+        </div>
+      </div>
+
+      <div id="confirm-dialog">
+        <div class="confirm-box">
+          <h3 id="confirm-title"></h3>
+          <p id="confirm-text"></p>
+          <div class="confirm-amount" id="confirm-amount"></div>
+          <div class="confirm-buttons">
+            <button class="confirm-no" id="confirm-cancel" type="button" onclick="window.cancelConfirm()">Cancelar</button>
+            <button class="confirm-yes" id="confirm-accept" type="button" onclick="window.acceptConfirm()">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel" class="panel-empty">
+      <button id="panel-close" type="button" title="Cerrar (Esc)">✕ Cerrar</button>
+      <div class="panel-core">
+        <div id="preview-3d">
+          <div id="preview-label">TORRE CONSTRUIDA</div>
+        </div>
+        <div id="stats-section"></div>
+        <div id="actions-section"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/app/main.js"></script>
+</body>
+</html>

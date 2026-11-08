@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>Iron Bastion - Panel Preview</title>
+  <link rel="stylesheet" href="/src/ui/styles.css" />
+  <style>
+    body {
+      overflow: auto;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 205, 140, 0.14), transparent 22%),
+        radial-gradient(circle at 80% 18%, rgba(104, 191, 127, 0.12), transparent 18%),
+        linear-gradient(180deg, #14202b 0%, #0b1320 100%);
+    }
+
+    #preview-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+    }
+
+    #preview-shell {
+      width: min(1520px, 100%);
+    }
+
+    #panel {
+      width: 100%;
+      height: 360px;
+      border: 1px solid rgba(146, 173, 192, 0.18);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow:
+        0 28px 64px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+  </style>
+</head>
+<body>
+  <div id="preview-page">
+    <div id="preview-shell">
+      <div id="panel" class="panel-empty">
+        <div class="panel-core">
+          <div id="preview-3d">
+            <div id="preview-label">DETALLE DE UNIDAD</div>
+          </div>
+          <div id="stats-section"></div>
+          <div id="actions-section"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/tools/labs/preview.js"></script>
+</body>
+</html>

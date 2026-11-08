@@ -1,0 +1,20 @@
+{
+  "id": "moto-recon-destruida",
+  "source": "assets/source/moto-recon-destruida.glb",
+  "publish": true,
+  "note": "Restos de la moto, generados con TRELLIS.2 en local; sin arma, van en una pieza.",
+  "forward": "-x",
+  "up": "+y",
+  "style": {
+    "simplify": 0.03,
+    "simplifyError": 0.05,
+    "brightness": 1.3,
+    "palette": [
+      "arena",
+      "arenaOscura",
+      "metal",
+      "metalOscuro",
+      "neumatico"
+    ]
+  }
+}

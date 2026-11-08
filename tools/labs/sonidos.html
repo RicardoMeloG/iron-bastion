@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iron Bastion - Elegir sonidos</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0; background: #0f172a; color: #e2e8f0; font: 15px system-ui, sans-serif; }
+    header { position: sticky; top: 0; z-index: 2; background: #0b1222; border-bottom: 1px solid #1e293b; padding: 12px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    h1 { font-size: 18px; margin: 0; }
+    main { max-width: 1100px; margin: 0 auto; padding: 16px 20px 80px; }
+    section { background: #111c33; border: 1px solid #1e293b; border-radius: 10px; margin: 14px 0; padding: 12px 16px; }
+    section.listo { border-color: #22c55e; }
+    h2 { font-size: 16px; margin: 0 0 8px; display: flex; gap: 10px; align-items: baseline; }
+    h2 small { color: #94a3b8; font-weight: normal; }
+    .fila { display: grid; grid-template-columns: 28px 1fr 320px; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid #1e293b; }
+    .fila:first-of-type { border-top: 0; }
+    .meta { color: #94a3b8; font-size: 13px; }
+    .meta a { color: #7dd3fc; }
+    audio { width: 320px; height: 32px; }
+    input[type=radio] { width: 18px; height: 18px; }
+    button { background: #22c55e; color: #052e16; border: 0; border-radius: 8px; padding: 8px 14px; font-weight: 700; cursor: pointer; }
+    #estado { color: #94a3b8; }
+    textarea { width: 100%; height: 160px; background: #0b1222; color: #e2e8f0; border: 1px solid #1e293b; border-radius: 8px; margin-top: 8px; display: none; }
+    @media (max-width: 760px) { .fila { grid-template-columns: 28px 1fr; } audio { width: 100%; grid-column: 2; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Elegir sonidos (CC0, Freesound)</h1>
+    <span id="estado"></span>
+    <button id="copiar" type="button">Copiar elección</button>
+  </header>
+  <main id="lista"></main>
+  <main><textarea id="salida" readonly></textarea></main>
+  <script type="module">
+    // Candidatos de tools/audio/buscar-sonidos.mjs. Elige uno por evento (o «ninguno sirve»); la
+    // elección queda en este navegador y «Copiar elección» la deja lista para pegar en el chat.
+    const BASE = '/tools/labs/sonidos/candidatos/';
+    const CLAVE = 'iron-bastion-sonidos';
+    const indice = await (await fetch(`${BASE}indice.json`)).json();
+    let eleccion = {};
+    try { eleccion = JSON.parse(localStorage.getItem(CLAVE) ?? '{}'); } catch { eleccion = {}; }
+    const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(eleccion)); } catch { /* sin almacenamiento */ } actualizar(); };
+    const lista = document.getElementById('lista');
+    const estado = document.getElementById('estado');
+    const total = Object.keys(indice).length;
+    function actualizar() {
+      estado.textContent = `${Object.keys(eleccion).length} de ${total} elegidos`;
+      for (const [id] of Object.entries(indice)) document.getElementById(`ev-${id}`)?.classList.toggle('listo', id in eleccion);
+    }
+    for (const [id, evento] of Object.entries(indice)) {
+      const seccion = document.createElement('section');
+      seccion.id = `ev-${id}`;
+      seccion.innerHTML = `<h2>${evento.nombre} <small>${id}${evento.bucle ? ' · se repite en bucle' : ''}</small></h2>`;
+      const opciones = [...evento.candidatos, { id: 'ninguno', nombre: 'Ninguno sirve' }];
+      for (const c of opciones) {
+        const fila = document.createElement('label');
+        fila.className = 'fila';
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = id;
+        radio.checked = eleccion[id] === c.id;
+        radio.addEventListener('change', () => { eleccion[id] = c.id; guardar(); });
+        const texto = document.createElement('div');
+        texto.innerHTML = c.id === 'ninguno'
+          ? '<b>Ninguno sirve</b> <span class="meta">busco otros</span>'
+          : `<b>${c.nombre}</b><div class="meta">${c.duracion} s · ${c.autor} · valoración ${c.valoracion} · ${c.descargas} descargas · <a href="${c.pagina}" target="_blank" rel="noopener">ver</a></div>`;
+        fila.append(radio, texto);
+        if (c.archivo) {
+          const audio = document.createElement('audio');
+          audio.controls = true;
+          audio.preload = 'none';
+          audio.loop = evento.bucle;
+          audio.src = BASE + c.archivo;
+          // Uno a la vez.
+          audio.addEventListener('play', () => document.querySelectorAll('audio').forEach((otro) => { if (otro !== audio) otro.pause(); }));
+          fila.append(audio);
+        }
+        seccion.append(fila);
+      }
+      lista.append(seccion);
+    }
+    document.getElementById('copiar').addEventListener('click', async () => {
+      const texto = JSON.stringify(eleccion);
+      const salida = document.getElementById('salida');
+      salida.value = texto;
+      salida.style.display = 'block';
+      try { await navigator.clipboard.writeText(texto); estado.textContent += ' · copiado'; } catch { salida.select(); }
+    });
+    actualizar();
+  </script>
+</body>
+</html>

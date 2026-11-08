@@ -1,0 +1,39 @@
+{
+  "id": "aa3-halcon-n3",
+  "source": "tools/asset-pipeline/blender/torres.py",
+  "hullLength": 1,
+  "hitRadius": 0.5005,
+  "height": 0.6714,
+  "turretPivot": [
+    0,
+    0.335,
+    0
+  ],
+  "gunPivot": [
+    0,
+    0.505,
+    0
+  ],
+  "muzzles": [
+    [
+      -0.024,
+      0.541,
+      0.5
+    ],
+    [
+      0.024,
+      0.541,
+      0.5
+    ],
+    [
+      -0.024,
+      0.493,
+      0.5
+    ],
+    [
+      0.024,
+      0.493,
+      0.5
+    ]
+  ]
+}

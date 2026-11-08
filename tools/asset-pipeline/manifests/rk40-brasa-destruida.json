@@ -1,0 +1,19 @@
+{
+  "id": "rk40-brasa-destruida",
+  "source": "assets/source/rk40-brasa-destruida.glb",
+  "publish": true,
+  "note": "Restos de la RK-40. Generado con TRELLIS.2 en local; sin torreta ni cañón, va en una pieza.",
+  "forward": "+z",
+  "up": "+y",
+  "style": {
+    "simplify": 0.12,
+    "simplifyError": 0.003,
+    "brightness": 1.25,
+    "keepColorBorders": true,
+    "palette": [
+      "arena",
+      "metal",
+      "metalOscuro"
+    ]
+  }
+}

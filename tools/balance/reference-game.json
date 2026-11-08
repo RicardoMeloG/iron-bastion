@@ -1,0 +1,28 @@
+{
+  "nota": "Compras de la partida real del 2026-11-06 (19-27-45), la primera ganada con escuadras: [torre, oleada, tipo, x, y], [roca, oleada, x, y], [ataque|blindaje, oleada, número de torre].",
+  "compras": [
+    ["torre", 1, "mg7-vulcan", 10, 5],
+    ["torre", 3, "mg7-vulcan", 10, 7],
+    ["torre", 3, "mg7-vulcan", 18, 6],
+    ["ataque", 4, 0],
+    ["ataque", 4, 1],
+    ["ataque", 5, 0],
+    ["ataque", 6, 1],
+    ["torre", 6, "lm2-lanza", 11, 6],
+    ["torre", 8, "lm2-lanza", 11, 5],
+    ["torre", 8, "lm2-lanza", 11, 7],
+    ["blindaje", 8, 0],
+    ["blindaje", 8, 1],
+    ["ataque", 8, 2],
+    ["ataque", 8, 2],
+    ["torre", 9, "lm2-lanza", 11, 4],
+    ["torre", 9, "lm2-lanza", 11, 8],
+    ["blindaje", 9, 6],
+    ["ataque", 10, 0],
+    ["blindaje", 10, 2],
+    ["torre", 10, "lm2-lanza", 12, 6],
+    ["torre", 10, "lm2-lanza", 12, 7],
+    ["torre", 10, "lm2-lanza", 15, 7],
+    ["torre", 10, "lm2-lanza", 12, 4]
+  ]
+}

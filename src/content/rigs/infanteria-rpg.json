@@ -1,0 +1,24 @@
+{
+  "id": "infanteria-rpg",
+  "source": "tools/asset-pipeline/blender/soldado.py",
+  "hullLength": 1,
+  "hitRadius": 1.3,
+  "height": 3.5,
+  "turretPivot": [
+    0,
+    1.72,
+    0
+  ],
+  "gunPivot": [
+    0,
+    2.68,
+    0
+  ],
+  "muzzles": [
+    [
+      0.4,
+      2.86,
+      1.68
+    ]
+  ]
+}
