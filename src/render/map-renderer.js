@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { MAT, mk } from './materials.js';
 import { gridToWorld } from '../core/coordinates.js';
 import { RENDERING_CONFIG } from './config/rendering.js';
@@ -9,7 +10,6 @@ export class MapRenderer {
   constructor(scene, config) {
     this.scene = scene;
     this.config = config;
-    this.cells = [];
     this.hoveredCell = null;
     const ri = MAP.rangeIndicator;
     this.rangeIndicator = mk(
@@ -57,36 +57,42 @@ export class MapRenderer {
     subGround.position.y = sg.yOffset * s;
     this.scene.add(subGround);
 
+    // El suelo no cambia en toda la partida: cada clase de pieza (pasto, calle, solera y línea)
+    // va en una sola malla. Con una por celda eran cientos de llamadas de dibujo por cuadro, y en
+    // el teléfono se notan. El pasto lleva su variación de tono en el color de cada vértice.
     const tl = MAP.tile;
     const cb = MAP.curb;
+    const grassPieces = [];
+    const roadPieces = [];
+    const curbPieces = [];
+    const dashPieces = [];
+    const piece = (sizeX, sizeY, sizeZ, x, y, z) => new THREE.BoxGeometry(sizeX, sizeY, sizeZ).translate(x, y, z);
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         const isPath = baseGrid[y][x] === 1;
-        const material = isPath ? MAT.road.clone() : MAT.grass.clone();
+        const tileHeight = isPath ? pathTileHeight : grassTileHeight;
+        const tileWorld = gridToWorld(x, y, s, this.config.halfWidth, this.config.halfHeight);
+        const tile = piece(tl.size * s, tileHeight, tl.size * s, tileWorld.x, tileHeight / 2, tileWorld.z);
         if (!isPath) {
           const variance = tl.grassVarianceMin + Math.random() * tl.grassVarianceRange;
-          material.color.setRGB(0.26 * variance, 0.56 * variance, 0.17 * variance);
+          paintVertices(tile, 0.26 * variance, 0.56 * variance, 0.17 * variance);
+          grassPieces.push(tile);
+          continue;
         }
-        const tileHeight = isPath ? pathTileHeight : grassTileHeight;
-        const tile = mk(new THREE.BoxGeometry(tl.size * s, tileHeight, tl.size * s), material);
-        const tileWorld = gridToWorld(x, y, s, this.config.halfWidth, this.config.halfHeight);
-        tile.position.set(tileWorld.x, tileHeight / 2, tileWorld.z);
-        tile.receiveShadow = true;
-        tile.userData = { gx: x, gy: y, baseMaterial: material };
-        this.scene.add(tile);
-        this.cells.push(tile);
-
-        if (isPath) {
-          const neighbors = [[0, 1], [0, -1], [1, 0], [-1, 0]];
-          for (const [dx, dy] of neighbors) {
-            const nx = x + dx;
-            const ny = y + dy;
-            if (nx < 0 || nx >= width || ny < 0 || ny >= height || baseGrid[ny][nx] !== 1) {
-              const curb = mk(new THREE.BoxGeometry((dx ? cb.thickness : tl.size) * s, cb.height * s, (dy ? cb.thickness : tl.size) * s), MAT.roadEdge);
-              curb.position.set(tileWorld.x + dx * cb.offset * s, cb.yOffset * s, tileWorld.z + dy * cb.offset * s);
-              curb.receiveShadow = true;
-              this.scene.add(curb);
-            }
+        roadPieces.push(tile);
+        const neighbors = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+        for (const [dx, dy] of neighbors) {
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx < 0 || nx >= width || ny < 0 || ny >= height || baseGrid[ny][nx] !== 1) {
+            curbPieces.push(piece(
+              (dx ? cb.thickness : tl.size) * s,
+              cb.height * s,
+              (dy ? cb.thickness : tl.size) * s,
+              tileWorld.x + dx * cb.offset * s,
+              cb.yOffset * s,
+              tileWorld.z + dy * cb.offset * s,
+            ));
           }
         }
       }
@@ -101,16 +107,37 @@ export class MapRenderer {
       let count = 0;
       while (xx !== pathPoints[index + 1][0] || yy !== pathPoints[index + 1][1]) {
         if (count % 2 === 0) {
-          const dash = mk(new THREE.BoxGeometry((dx ? rd.length : rd.width) * s, rd.height * s, (dy ? rd.length : rd.width) * s), MAT.roadLine);
           const dashWorld = gridToWorld(xx, yy, s, this.config.halfWidth, this.config.halfHeight);
-          dash.position.set(dashWorld.x, rd.yOffset * s, dashWorld.z);
-          this.scene.add(dash);
+          dashPieces.push(piece((dx ? rd.length : rd.width) * s, rd.height * s, (dy ? rd.length : rd.width) * s, dashWorld.x, rd.yOffset * s, dashWorld.z));
         }
         xx += dx;
         yy += dy;
         count += 1;
       }
     }
+
+    const grassMaterial = MAT.grass.clone();
+    grassMaterial.color.setRGB(1, 1, 1);
+    grassMaterial.vertexColors = true;
+    for (const [pieces, material, receiveShadow] of [
+      [grassPieces, grassMaterial, true],
+      [roadPieces, MAT.road, true],
+      [curbPieces, MAT.roadEdge, true],
+      [dashPieces, MAT.roadLine, false],
+    ]) {
+      if (!pieces.length) continue;
+      const mesh = mk(mergeGeometries(pieces), material);
+      mesh.receiveShadow = receiveShadow;
+      this.scene.add(mesh);
+      for (const geometry of pieces) geometry.dispose();
+    }
+
+    // Marca de la celda bajo el cursor: una caja encima de la baldosa, con el color de la acción.
+    const marker = MAP.hoverMarker;
+    this.hoverMarker = mk(new THREE.BoxGeometry(tl.size * s, 1, tl.size * s), MAT.hover);
+    this.hoverMarker.visible = false;
+    this.hoverMarker.userData.lift = marker.lift * s;
+    this.scene.add(this.hoverMarker);
 
     this.buildEdgeFog();
 
@@ -141,11 +168,6 @@ export class MapRenderer {
   updateAnimatedMarkers(elapsedTime) {
     this.spawnMarker.rotation.y = elapsedTime * MAP.markers.spawn.rotationSpeed;
     this.baseMarker.rotation.y = elapsedTime * MAP.markers.base.rotationSpeed;
-  }
-
-  restoreCell(gx, gy) {
-    const cell = this.cells[gy * this.config.mapDefinition.width + gx];
-    if (cell) cell.material = cell.userData.baseMaterial;
   }
 
   /** Niebla oscura sobre el territorio enemigo: los vehículos salen de ella. */
@@ -193,18 +215,20 @@ export class MapRenderer {
   }
 
   updateHover(state, hoveredCell, towerDefinitions) {
-    if (this.hoveredCell) {
-      this.restoreCell(this.hoveredCell.gx, this.hoveredCell.gy);
-    }
-
     this.hoveredCell = hoveredCell;
     this.rangeIndicator.visible = false;
+    this.hoverMarker.visible = Boolean(hoveredCell);
     if (!hoveredCell) return;
 
-    const cell = this.cells[hoveredCell.gy * this.config.mapDefinition.width + hoveredCell.gx];
     const cellValue = state.grid[hoveredCell.gy][hoveredCell.gx];
     // Una torre o una roca se puede abrir; la roca, para sacarla.
-    cell.material = cellValue === 0 ? MAT.hover : cellValue === 2 || cellValue === 4 ? MAT.selected : MAT.invalid;
+    this.hoverMarker.material = cellValue === 0 ? MAT.hover : cellValue === 2 || cellValue === 4 ? MAT.selected : MAT.invalid;
+    const isPath = this.config.baseGrid[hoveredCell.gy][hoveredCell.gx] === 1;
+    const tileHeight = isPath ? this.config.pathTileHeightWorld : this.config.groundTileHeightWorld;
+    const markerHeight = tileHeight + this.hoverMarker.userData.lift;
+    const cellWorld = gridToWorld(hoveredCell.gx, hoveredCell.gy, this.config.worldScale, this.config.halfWidth, this.config.halfHeight);
+    this.hoverMarker.scale.y = markerHeight;
+    this.hoverMarker.position.set(cellWorld.x, markerHeight / 2, cellWorld.z);
 
     const riYOffset = MAP.rangeIndicator.yOffset;
     if (cellValue === 0) {
@@ -221,4 +245,12 @@ export class MapRenderer {
       this.rangeIndicator.position.set(tower.wx, riYOffset * this.config.worldScale, tower.wz);
     }
   }
+}
+
+/** Pinta todos los vértices de una pieza con un color (espacio de trabajo lineal, como `setRGB`). */
+function paintVertices(geometry, r, g, b) {
+  const count = geometry.attributes.position.count;
+  const colors = new Float32Array(count * 3);
+  for (let index = 0; index < count; index++) colors.set([r, g, b], index * 3);
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 }

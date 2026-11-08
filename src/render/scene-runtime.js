@@ -148,10 +148,11 @@ export function createSceneRuntime({
   let camSize = fitCamSize * zoomRatio;
 
   const camera = new THREE.OrthographicCamera(-1, 1, camSize, -camSize, 0.1, framingConfig.farPlane * worldScale);
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, framingConfig.maxPixelRatio));
+  const touchDevice = isTouchDevice() ? framingConfig.touchDevice : null;
+  const renderer = new THREE.WebGLRenderer({ antialias: touchDevice?.antialias ?? true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, touchDevice?.maxPixelRatio ?? framingConfig.maxPixelRatio));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = touchDevice && !touchDevice.softShadows ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
   viewportEl.insertBefore(renderer.domElement, viewportEl.firstChild);
   const recenterRaycaster = new THREE.Raycaster();
   const recenterPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -169,7 +170,8 @@ export function createSceneRuntime({
   sunLight.shadow.camera.right = lighting.sun.shadowBounds * worldScale;
   sunLight.shadow.camera.top = lighting.sun.shadowBounds * worldScale;
   sunLight.shadow.camera.bottom = -lighting.sun.shadowBounds * worldScale;
-  sunLight.shadow.mapSize.set(lighting.sun.shadowMapSize, lighting.sun.shadowMapSize);
+  const shadowMapSize = touchDevice?.shadowMapSize ?? lighting.sun.shadowMapSize;
+  sunLight.shadow.mapSize.set(shadowMapSize, shadowMapSize);
   scene.add(sunLight);
 
   const fillLight = new THREE.DirectionalLight(lighting.fill.color, lighting.fill.intensity);
@@ -293,4 +295,9 @@ export function createSceneRuntime({
       };
     },
   };
+}
+
+/** Pantalla táctil sin mouse: teléfonos y tabletas. */
+export function isTouchDevice() {
+  return typeof window.matchMedia === 'function' && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 }

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { aimTurret } from './units.js';
+import { isTouchDevice } from './scene-runtime.js';
 
 export class TowerPreview {
   constructor(containerEl, buildTowerMesh) {
@@ -80,8 +81,10 @@ export class TowerPreview {
       this.sparkles.push(sparkle);
     }
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // En pantallas táctiles, la misma rebaja que el mapa (ver FRAMING_CONFIG.touchDevice).
+    const touch = isTouchDevice();
+    this.renderer = new THREE.WebGLRenderer({ antialias: !touch });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, touch ? 1.25 : 2));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.setSize(320, 360);

@@ -15,6 +15,7 @@ export {
   clearCover,
   getLateWaveScale,
   getSellRefund,
+  getTowerLimit,
   getTowerMaxHp,
   placeTower,
   selectTargets,

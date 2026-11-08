@@ -604,11 +604,14 @@ window.addEventListener('mouseup', () => {
 sceneRuntime.renderer.domElement.addEventListener('contextmenu', (event) => event.preventDefault());
 document.getElementById('panel-close').addEventListener('click', () => setTowerDetailsOpen(false));
 
-sceneRuntime.renderer.domElement.addEventListener('click', () => {
+sceneRuntime.renderer.domElement.addEventListener('click', (event) => {
   if (didDrag) {
     didDrag = false;
     return;
   }
+  // Un toque no pasa antes por la celda como el mouse: la celda es la del clic.
+  hoveredCell = getGridCell(event);
+  refreshHover();
 
   if (state.gameOver) return;
   const obstacleWasOpen = Boolean(selectedObstacleId);
@@ -645,6 +648,55 @@ sceneRuntime.renderer.domElement.addEventListener('click', () => {
   state.selectedTowerId = null;
   renderUi();
 });
+
+// Pantallas táctiles: un dedo toca o arrastra el mapa; dos dedos lo acercan o alejan.
+const touchPoints = new Map();
+let touchTravel = 0;
+let pinchDistance = null;
+
+function touchPinch() {
+  const [a, b] = [...touchPoints.values()];
+  return { distance: Math.hypot(a.x - b.x, a.y - b.y), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+}
+
+sceneRuntime.renderer.domElement.addEventListener('pointerdown', (event) => {
+  if (event.pointerType !== 'touch') return;
+  touchPoints.set(event.pointerId, { x: event.clientX, y: event.clientY });
+  if (touchPoints.size === 1) {
+    touchTravel = 0;
+    didDrag = false;
+  } else if (touchPoints.size === 2) {
+    pinchDistance = touchPinch().distance;
+    didDrag = true;
+  }
+});
+
+sceneRuntime.renderer.domElement.addEventListener('pointermove', (event) => {
+  const previous = touchPoints.get(event.pointerId);
+  if (event.pointerType !== 'touch' || !previous) return;
+  const dx = event.clientX - previous.x;
+  const dy = event.clientY - previous.y;
+  previous.x = event.clientX;
+  previous.y = event.clientY;
+
+  if (touchPoints.size === 2 && pinchDistance != null) {
+    const pinch = touchPinch();
+    sceneRuntime.zoom((pinchDistance - pinch.distance) * GAMEPLAY_CONFIG.ui.pinchZoomScale, pinch.x, pinch.y);
+    pinchDistance = pinch.distance;
+    return;
+  }
+  if (touchPoints.size !== 1) return;
+  touchTravel += Math.hypot(dx, dy);
+  if (touchTravel > GAMEPLAY_CONFIG.ui.touchDragThreshold) didDrag = true;
+  if (didDrag) sceneRuntime.panBy(dx, dy);
+});
+
+function releaseTouch(event) {
+  touchPoints.delete(event.pointerId);
+  if (touchPoints.size < 2) pinchDistance = null;
+}
+sceneRuntime.renderer.domElement.addEventListener('pointerup', releaseTouch);
+sceneRuntime.renderer.domElement.addEventListener('pointercancel', releaseTouch);
 
 sceneRuntime.renderer.domElement.addEventListener(
   'wheel',
@@ -756,6 +808,8 @@ if (import.meta.env.DEV) {
     core: { placeTower, startWave, upgradeTower, upgradeTowerDefense, sellTower, clearCover, resetWave, resetAll },
     renderers: { enemyRenderer, towerRenderer, projectileRenderer },
     camera: sceneRuntime.camera,
+    // Llamadas de dibujo del último cuadro (`renderer.info.render.calls`), para medir el render.
+    renderInfo: () => ({ ...sceneRuntime.renderer.info.render }),
     setMuted,
     setSpeed: (speed) => {
       setSimulationSpeed(Math.max(1, Math.round(speed)));

@@ -14,6 +14,7 @@
     "check:dist": "node scripts/check-dist.mjs",
     "check": "npm test && npm run check:boundaries && npm run check:rigs && npm run build",
     "walkthrough": "node scripts/walkthrough.mjs",
+    "check:mobile": "node scripts/check-mobile.mjs",
     "simulate": "node scripts/simulate.mjs",
     "assets:normalize": "node tools/asset-pipeline/normalize.mjs",
     "assets:inspect": "node tools/asset-pipeline/inspect.mjs",

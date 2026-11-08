@@ -27,6 +27,10 @@ export const GAMEPLAY_CONFIG = {
     maxMuzzleAimError: 0.14,
     initialSpawnDelay: 0.4,
     finalEnemySpacing: 0.5,
+    // Tope de torres en el mapa (las destruidas cuentan): `base` más `perWave` por cada oleada,
+    // contando la que se prepara, hasta `max`. Llenar el mapa de torres básicas no debe ganar, y
+    // cada torre cuesta rendimiento en el teléfono. Las partidas de referencia nunca pasan de 16.
+    towerLimit: { base: 4, perWave: 1, max: 20 },
   },
 
   effects: {
@@ -220,5 +224,9 @@ export const GAMEPLAY_CONFIG = {
 
   ui: {
     dragThreshold: 2,
+    // Táctil: cuántos píxeles debe recorrer el dedo para que sea arrastre y no toque, y cuánto
+    // zoom da cada píxel que se abren o cierran dos dedos (en unidades de la rueda del mouse).
+    touchDragThreshold: 10,
+    pinchZoomScale: 3,
   },
 };

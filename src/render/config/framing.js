@@ -7,6 +7,14 @@ export const FRAMING_CONFIG = {
   lookAtXOffset: 0,
   lookAtZOffset: 0,
   maxPixelRatio: 2,
+  // Pantallas táctiles (teléfonos y tabletas): con su densidad de píxeles, sombras suaves y
+  // antialias la gráfica dibuja hasta 9 veces más píxeles que en un monitor y se arrastra.
+  touchDevice: {
+    maxPixelRatio: 1.25,
+    antialias: false,
+    softShadows: false,
+    shadowMapSize: 512,
+  },
   fitPadding: 1.02,
   fitPlayablePadding: 0.7,
   initialZoomRatio: 0,

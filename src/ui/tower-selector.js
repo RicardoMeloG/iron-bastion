@@ -1,4 +1,4 @@
-import { estimateTowerEffectiveness } from '../core/index.js';
+import { estimateTowerEffectiveness, getTowerLimit } from '../core/index.js';
 import { ICONS } from './icons.js';
 import { makeTowerVersus } from './tower-panel-presenter.js';
 
@@ -36,12 +36,13 @@ export class TowerSelector {
   }
 
   render(state) {
+    const atLimit = state.towers.length >= getTowerLimit(state);
     for (const [towerTypeId, card] of this.cards) {
       const definition = state.config.towerDefinitions[towerTypeId];
       card.classList.toggle('active', state.buildTowerTypeId === towerTypeId);
       // Mientras se inspecciona una torre, el próximo clic en el campo no construye.
       card.classList.toggle('standby', Boolean(state.selectedTowerId));
-      card.classList.toggle('unaffordable', state.credits < definition.economy.baseCost);
+      card.classList.toggle('unaffordable', atLimit || state.credits < definition.economy.baseCost);
       card.setAttribute('aria-pressed', String(state.buildTowerTypeId === towerTypeId));
     }
   }

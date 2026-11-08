@@ -1,3 +1,4 @@
+import { getTowerLimit } from '../core/index.js';
 import { GAMEPLAY_CONFIG } from '../content/gameplay.js';
 
 export class HudPresenter {
@@ -8,6 +9,9 @@ export class HudPresenter {
     this.waveTotalEl = doc.getElementById('wave-total');
     this.countdownEl = doc.getElementById('wave-countdown');
     this.enemyCountEl = doc.getElementById('enemy-count');
+    this.towerCountEl = doc.getElementById('tower-count');
+    this.towerLimitEl = doc.getElementById('tower-limit');
+    this.towerCountStatEl = doc.getElementById('tower-count-stat');
     this.lifeFillEl = doc.getElementById('life-bar-fill');
     this.waveButtonEl = doc.getElementById('wave-btn');
     this.overlayEl = doc.getElementById('overlay');
@@ -16,6 +20,8 @@ export class HudPresenter {
     this.overlayRetryEl = doc.getElementById('overlay-retry');
     this.tipEl = doc.getElementById('tip');
     this.resetWaveEl = doc.getElementById('reset-wave-btn');
+    // Teléfonos y tabletas: los consejos hablan de tocar, no de teclas ni del mouse.
+    this.touch = doc.defaultView?.matchMedia?.('(hover: none) and (pointer: coarse)').matches ?? false;
   }
 
   setTip(parts) {
@@ -30,6 +36,10 @@ export class HudPresenter {
     this.waveEl.textContent = state.wave;
     this.waveTotalEl.textContent = state.config.waveSet.waves.length;
     this.enemyCountEl.textContent = state.enemies.length;
+    const towerLimit = getTowerLimit(state);
+    this.towerCountEl.textContent = state.towers.length;
+    this.towerLimitEl.textContent = Number.isFinite(towerLimit) ? towerLimit : '∞';
+    this.towerCountStatEl.classList.toggle('at-limit', state.towers.length >= towerLimit);
 
     const waiting = state.waveCountdown != null && !state.waveActive && !state.gameOver && !state.developerMode.enabled;
     this.countdownEl.hidden = !waiting;
@@ -66,7 +76,9 @@ export class HudPresenter {
       } else if (state.waveActive) {
         this.setTip(['Oleada en curso: puedes construir, mejorar y vender mientras combates', 'P: pausa', 'V: velocidad']);
       } else {
-        this.setTip(['Clic: colocar', '1 a 4: elegir torre', 'Clic en torre: mejorar', 'Clic en roca o árbol: sacarlo', 'Rueda: zoom', 'Botón derecho: mover', 'Botón central: girar', 'M: sonido', 'P: pausa']);
+        this.setTip(this.touch
+          ? ['Toca una celda: colocar', 'Toca una torre: mejorar', 'Arrastra: mover', 'Pellizca: zoom']
+          : ['Clic: colocar', '1 a 4: elegir torre', 'Clic en torre: mejorar', 'Clic en roca o árbol: sacarlo', 'Rueda: zoom', 'Botón derecho: mover', 'Botón central: girar', 'M: sonido', 'P: pausa']);
       }
     }
 

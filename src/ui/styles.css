@@ -51,6 +51,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
   overflow: hidden;
 }
 canvas { display: block; }
+/* El mapa maneja los gestos: el navegador no debe desplazar ni ampliar la página. */
+#viewport canvas { touch-action: none; }
 #field > canvas {
   width: calc(100% + var(--cfg-canvas-overscan-x)) !important;
   height: 100% !important;
@@ -1660,3 +1662,33 @@ body.overlay-active #panel {
 .next-wave-list-tight img { width: 26px; height: 26px; }
 .next-wave-list-tight .next-wave-name { font-size: 11px; }
 .next-wave-list-tight .next-wave-name b { font-size: 12px; }
+
+/* Torres puestas y tope, junto a «Construir»; al llegar al tope se marca y las tarjetas se apagan. */
+.build-limit { margin-left: auto; padding-right: 4px; color: var(--ui-gold); font-variant-numeric: tabular-nums; }
+.side-title-icon { flex-shrink: 0; }
+/* Columna angosta: sin el ícono, para que quepa el contador. */
+@media (max-width: 1500px) {
+  .side-title:has(.build-limit) .side-title-icon { display: none; }
+}
+.build-limit.at-limit { color: #ff8a3d; }
+
+/* En un teléfono en vertical el mapa queda en una franja: se pide girarlo. */
+#rotate-notice { display: none; }
+@media (orientation: portrait) and (hover: none) and (pointer: coarse) {
+  #rotate-notice {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+    background: #0b1626;
+    color: #eef4fa;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+  }
+}

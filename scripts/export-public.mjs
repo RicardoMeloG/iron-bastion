@@ -67,12 +67,12 @@ mkdirSync(path.join(destination, '.github/workflows'), { recursive: true });
 copyFileSync('tools/publish/pages.yml', path.join(destination, '.github/workflows/pages.yml'));
 if (url) {
   for (const [file, before, after] of [
-    ['README.md', '**Jugar:** se agrega el enlace al publicar.', `**Jugar:** [${url}](${url})`],
-    ['README.en.md', '**Play:** the link is added when published.', `**Play:** [${url}](${url})`],
+    ['README.md', /\*\*Jugar:\*\*.*/, `**Jugar:** [${url}](${url})`],
+    ['README.en.md', /\*\*Play:\*\*.*/, `**Play:** [${url}](${url})`],
   ]) {
     const target = path.join(destination, file);
     const text = readFileSync(target, 'utf8');
-    if (!text.includes(before)) throw new Error(`${file} no tiene la línea del enlace`);
+    if (!before.test(text)) throw new Error(`${file} no tiene la línea del enlace`);
     writeFileSync(target, text.replace(before, after));
   }
 }

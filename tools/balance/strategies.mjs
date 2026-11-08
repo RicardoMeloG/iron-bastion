@@ -296,6 +296,8 @@ export function runStrategy(name, strategy = STRATEGIES[name], { seed } = {}) {
 export function runMatchup(towers, spawns) {
   const state = createInitialState(createGameConfig());
   state.credits = Number.POSITIVE_INFINITY;
+  // Un duelo mide un cruce, no una partida: sin el tope de torres por oleada.
+  state.developerMode.enabled = true;
   state.lives = spawns.length + 1;
   for (const { towerTypeId, level, count: wanted } of towers) {
     for (let index = 0; index < wanted; index++) {

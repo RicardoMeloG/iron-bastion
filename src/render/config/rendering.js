@@ -3,6 +3,8 @@ export const RENDERING_CONFIG = {
     ground: { padding: 3.2, height: 0.12, yOffset: -0.06 },
     subGround: { padding: 4.4, height: 0.3, yOffset: -0.25, color: 0x3d6630 },
     tile: { size: 0.96, grassVarianceMin: 0.9, grassVarianceRange: 0.2 },
+    // Cuánto sobresale de la baldosa la marca de la celda bajo el cursor (celdas).
+    hoverMarker: { lift: 0.008 },
     // Niebla sobre el territorio enemigo: opaca lejos y se abre justo antes del tablero, en
     // `fadeColumns` celdas. Es larga para que siga cubriendo al girar la vista.
     edgeFog: { fadeColumns: 2.2, endColumn: 7, lengthColumns: 40, depthColumns: 60, y: 0.6, renderOrder: 20 },

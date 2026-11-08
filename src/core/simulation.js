@@ -1279,6 +1279,14 @@ function updateEnemyWeapons(state, dt) {
   }
 }
 
+/** Cuántas torres caben ahora: crece con la oleada en curso o la que se prepara. */
+export function getTowerLimit(state) {
+  if (state.developerMode.enabled) return Infinity;
+  const { base, perWave, max } = SIM.towerLimit;
+  const wave = state.waveActive ? state.wave : state.wave + 1;
+  return Math.min(max, base + perWave * Math.max(1, wave));
+}
+
 export function placeTower(state, placement) {
   const towerTypeId = placement.towerTypeId ?? 'mg7-vulcan';
   const definition = state.config.towerDefinitions[towerTypeId];
@@ -1288,7 +1296,7 @@ export function placeTower(state, placement) {
     return null;
   }
 
-  if (state.grid[gy]?.[gx] !== 0 || state.credits < definition.economy.baseCost) {
+  if (state.grid[gy]?.[gx] !== 0 || state.credits < definition.economy.baseCost || state.towers.length >= getTowerLimit(state)) {
     return null;
   }
 
