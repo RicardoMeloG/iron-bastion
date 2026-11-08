@@ -1701,3 +1701,47 @@ body.overlay-active #panel {
 
 /* Pantalla completa: solo en pantallas táctiles con la API disponible y fuera de ella (main.js). */
 #fullscreen-btn[hidden] { display: none; }
+
+/* Teléfono en horizontal (unos 360-430 px de alto): las cuatro torres no caben en columna. Van en
+   dos columnas, solo con imagen, nombre y costo (el detalle está al tocar la torre puesta), y la
+   lista se puede desplazar por si no alcanza. La cuenta regresiva, que quedaba detrás de los
+   botones, baja al borde superior del mapa. */
+@media (max-height: 520px) {
+  .tower-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    max-height: calc(100% - 30px);
+    overflow-y: auto;
+  }
+  .tower-card { padding: 3px 2px 4px; gap: 0; }
+  .tower-card-image { width: 100%; height: 34px; object-fit: contain; }
+  .tower-card-name { font-size: 12px; }
+  .tower-card-cost { font-size: 11px; }
+  .tower-card-class,
+  .tower-card .versus-title,
+  .tower-card .versus-chips,
+  .tower-card .versus-air,
+  .tower-card .versus-chip { display: none; }
+  /* La elegida ya lleva el borde dorado: la etiqueta, partida en dos líneas, tapaba la imagen. */
+  .tower-card.active:not(.standby) .tower-card-tag { display: none; }
+  /* Solo íconos y cifras, en una fila: con los nombres, se apilaban y «Créditos» quedaba cortado. */
+  #hud > div:first-child > div:first-child { flex-wrap: nowrap; }
+  .hud-label { display: none; }
+  .hud-stat { padding: 0 8px; font-size: 12px; gap: 4px; white-space: nowrap; }
+  .hud-val { font-size: 14px; }
+  .hud-icon { width: 15px; height: 15px; }
+  .hud-bevel {
+    top: 100%;
+    left: 50%;
+    right: auto;
+    width: auto;
+    height: auto;
+    padding: 2px 12px 4px;
+    transform: translateX(-50%);
+    background: rgba(11, 22, 38, .82);
+    clip-path: none;
+    border-radius: 0 0 8px 8px;
+  }
+  #wave-countdown { font-size: 20px; }
+}

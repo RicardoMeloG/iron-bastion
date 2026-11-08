@@ -10,6 +10,8 @@ import { chromium } from 'playwright-core';
 const OUT = 'walkthrough';
 const PHONES = [
   { name: 'horizontal', width: 915, height: 412 },
+  // Pantalla completa de un Android angosto (la del dueño, 08-11): cuatro torres sin desplazarse.
+  { name: 'horizontal-bajo', width: 800, height: 360 },
   { name: 'vertical', width: 412, height: 915 },
 ];
 
@@ -91,6 +93,13 @@ try {
       }
       return null;
     });
+    // Las cuatro tarjetas de torre deben verse enteras: si no, en el teléfono no hay cómo elegirlas.
+    const hiddenCards = await page.evaluate(() => [...document.querySelectorAll('.tower-card')].filter((card) => {
+      const rect = card.getBoundingClientRect();
+      const box = card.parentElement.getBoundingClientRect();
+      return rect.bottom > Math.min(box.bottom, window.innerHeight) + 1 || rect.height === 0;
+    }).map((card) => card.dataset.towerTypeId));
+    if (hiddenCards.length) problems.push(`${phone.name}: tarjetas cortadas: ${hiddenCards.join(', ')}`);
     if (!target) problems.push(`${phone.name}: no hay una celda libre visible para tocar`);
     else {
       await page.touchscreen.tap(target.x, target.y);
