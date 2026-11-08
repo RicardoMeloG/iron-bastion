@@ -72,9 +72,12 @@ export class HudPresenter {
 
     if (this.tipEl) {
       if (state.selectedTowerId) {
-        this.setTip(['Torre seleccionada', 'i: ver detalle', 'Esc o clic en el campo: cerrar']);
+        this.setTip(this.touch
+          ? ['Torre seleccionada', 'Toca el campo: cerrar']
+          : ['Torre seleccionada', 'i: ver detalle', 'Esc o clic en el campo: cerrar']);
       } else if (state.waveActive) {
-        this.setTip(['Oleada en curso: puedes construir, mejorar y vender mientras combates', 'P: pausa', 'V: velocidad']);
+        const tip = 'Oleada en curso: puedes construir, mejorar y vender mientras combates';
+        this.setTip(this.touch ? [tip] : [tip, 'P: pausa', 'V: velocidad']);
       } else {
         this.setTip(this.touch
           ? ['Toca una celda: colocar', 'Toca una torre: mejorar', 'Arrastra: mover', 'Pellizca: zoom']

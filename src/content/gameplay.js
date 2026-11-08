@@ -228,5 +228,7 @@ export const GAMEPLAY_CONFIG = {
     // zoom da cada píxel que se abren o cierran dos dedos (en unidades de la rueda del mouse).
     touchDragThreshold: 10,
     pinchZoomScale: 3,
+    // Tras soltar el dedo, cuánto queda marcada la celda tocada (ms): tiempo para que el clic la use.
+    touchMarkerClearMs: 250,
   },
 };

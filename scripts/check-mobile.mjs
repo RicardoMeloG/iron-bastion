@@ -93,6 +93,19 @@ try {
       }
       return null;
     });
+    // El contador más ancho posible («20/20») debe caber junto a «CONSTRUIR».
+    const limitOverflow = await page.evaluate(() => {
+      const count = document.getElementById('tower-count');
+      const limit = document.getElementById('tower-limit');
+      const saved = [count.textContent, limit.textContent];
+      count.textContent = '20';
+      limit.textContent = '20';
+      const title = document.getElementById('tower-count-stat').parentElement;
+      const overflow = title.scrollWidth - title.clientWidth;
+      [count.textContent, limit.textContent] = saved;
+      return overflow;
+    });
+    if (limitOverflow > 0) problems.push(`${phone.name}: «CONSTRUIR 20/20» se sale ${limitOverflow} px de su columna`);
     // Las cuatro tarjetas de torre deben verse enteras: si no, en el teléfono no hay cómo elegirlas.
     const hiddenCards = await page.evaluate(() => [...document.querySelectorAll('.tower-card')].filter((card) => {
       const rect = card.getBoundingClientRect();

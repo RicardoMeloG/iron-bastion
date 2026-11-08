@@ -718,8 +718,15 @@ sceneRuntime.renderer.domElement.addEventListener('pointermove', (event) => {
 });
 
 function releaseTouch(event) {
-  touchPoints.delete(event.pointerId);
+  if (!touchPoints.delete(event.pointerId)) return;
   if (touchPoints.size < 2) pinchDistance = null;
+  // Sin cursor nada quita la marca de la celda tocada: se borra cuando el toque ya hizo su clic.
+  if (touchPoints.size === 0) {
+    setTimeout(() => {
+      hoveredCell = null;
+      refreshHover();
+    }, GAMEPLAY_CONFIG.ui.touchMarkerClearMs);
+  }
 }
 sceneRuntime.renderer.domElement.addEventListener('pointerup', releaseTouch);
 sceneRuntime.renderer.domElement.addEventListener('pointercancel', releaseTouch);

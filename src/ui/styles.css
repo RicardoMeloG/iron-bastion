@@ -1725,6 +1725,8 @@ body.overlay-active #panel {
   .tower-card .versus-chip { display: none; }
   /* La elegida ya lleva el borde dorado: la etiqueta, partida en dos líneas, tapaba la imagen. */
   .tower-card.active:not(.standby) .tower-card-tag { display: none; }
+  /* «CONSTRUIR 10/14» no cabía en la columna. */
+  .side-title { font-size: 13px; letter-spacing: 0; gap: 4px; }
   /* Solo íconos y cifras, en una fila: con los nombres, se apilaban y «Créditos» quedaba cortado. */
   #hud > div:first-child > div:first-child { flex-wrap: nowrap; }
   .hud-label { display: none; }
