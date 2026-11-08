@@ -114,6 +114,21 @@ try {
       return overflow;
     });
     if (limitOverflow > 0) problems.push(`${phone.name}: «CONSTRUIR 20/20» se sale ${limitOverflow} px de su columna`);
+    // El botón de la oleada va en una línea: con dos cifras («▶ Oleada 19 ahora») debe caber.
+    const waveButtonOverflow = await page.evaluate(() => {
+      const { state } = window.__game;
+      const saved = state.wave;
+      state.wave = 18;
+      state.uiDirty = true;
+      return new Promise((resolve) => setTimeout(() => {
+        const button = document.getElementById('wave-btn');
+        const overflow = button.scrollWidth - button.clientWidth;
+        state.wave = saved;
+        state.uiDirty = true;
+        resolve(overflow);
+      }, 300));
+    });
+    if (waveButtonOverflow > 0) problems.push(`${phone.name}: «Oleada 19 ahora» se sale ${waveButtonOverflow} px de su botón`);
     // Las cuatro tarjetas de torre deben verse enteras: si no, en el teléfono no hay cómo elegirlas.
     const hiddenCards = await page.evaluate(() => [...document.querySelectorAll('.tower-card')].filter((card) => {
       const rect = card.getBoundingClientRect();
