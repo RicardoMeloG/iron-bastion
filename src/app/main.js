@@ -472,7 +472,33 @@ function closeStartScreen() {
   startScreenEl.classList.remove('show');
   document.body.classList.remove('start-active');
 }
-startButtonEl.addEventListener('click', closeStartScreen);
+
+// Pantalla completa en el teléfono: el navegador solo la concede tras un toque del jugador, así
+// que se pide al tocar «Jugar» y con el botón ⛶ (si sale con el gesto de atrás). El iPhone no la
+// ofrece a una página: ahí el botón no aparece.
+const fullscreenButtonEl = document.getElementById('fullscreen-btn');
+const touchScreen = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+const canFullscreen = touchScreen && document.fullscreenEnabled && typeof document.documentElement.requestFullscreen === 'function';
+
+function enterFullscreen() {
+  if (!canFullscreen || document.fullscreenElement) return;
+  document.documentElement
+    .requestFullscreen({ navigationUI: 'hide' })
+    .then(() => screen.orientation?.lock?.('landscape'))
+    .catch(() => {});
+}
+
+function syncFullscreenButton() {
+  fullscreenButtonEl.hidden = !canFullscreen || Boolean(document.fullscreenElement);
+}
+document.addEventListener('fullscreenchange', syncFullscreenButton);
+fullscreenButtonEl.addEventListener('click', enterFullscreen);
+syncFullscreenButton();
+
+startButtonEl.addEventListener('click', () => {
+  enterFullscreen();
+  closeStartScreen();
+});
 document.getElementById('help-btn').addEventListener('click', openStartScreen);
 openStartScreen();
 

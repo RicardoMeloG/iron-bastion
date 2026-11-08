@@ -1692,3 +1692,12 @@ body.overlay-active #panel {
     text-align: center;
   }
 }
+
+/* En el teléfono, 100vh mide la pantalla como si la barra del navegador no estuviera y el HUD
+   queda cortado arriba; 100dvh mide lo que se ve. */
+@supports (height: 100dvh) {
+  :root { --cfg-app-height: 100dvh; }
+}
+
+/* Pantalla completa: solo en pantallas táctiles con la API disponible y fuera de ella (main.js). */
+#fullscreen-btn[hidden] { display: none; }

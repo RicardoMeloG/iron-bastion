@@ -61,11 +61,12 @@ try {
     }
     if (rotateNotice) problems.push(`${phone.name}: el aviso para girar tapa el juego`);
 
-    await page.evaluate(() => {
-      window.__game.setMuted(true);
-      window.__game.closeStartScreen();
-    });
-    await page.waitForTimeout(500);
+    // Entrar con «Jugar» como un jugador: en un teléfono, ese toque pide la pantalla completa.
+    await page.evaluate(() => window.__game.setMuted(true));
+    await page.getByText('Jugar', { exact: true }).tap();
+    await page.waitForTimeout(800);
+    const fullscreen = await page.evaluate(() => Boolean(document.fullscreenElement));
+    console.log(`${phone.name}: pantalla completa al tocar «Jugar»: ${fullscreen ? 'sí' : 'no (Chrome sin pantalla puede negarla)'}`);
 
     const pixelRatio = await page.evaluate(() => window.__game.renderers && document.querySelector('#viewport canvas').width / document.querySelector('#viewport canvas').clientWidth);
 
