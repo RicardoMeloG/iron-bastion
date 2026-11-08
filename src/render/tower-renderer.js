@@ -161,12 +161,63 @@ function buildTowerHpBar(definition, level, worldScale) {
   };
 }
 
+// La flecha de «se puede evolucionar»: un círculo verde con una flecha hacia arriba, dibujado una
+// vez en un lienzo y compartido por todas las torres (cada una lleva su propio material para
+// titilar a su ritmo sin afectar a las demás).
+let upgradeBadgeTexture = null;
+function getUpgradeBadgeTexture() {
+  if (upgradeBadgeTexture) return upgradeBadgeTexture;
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const context = canvas.getContext('2d');
+  context.fillStyle = TWR.upgradeBadge.color;
+  context.strokeStyle = '#0b1626';
+  context.lineWidth = 8;
+  context.beginPath();
+  context.arc(64, 64, 58, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+  context.strokeStyle = '#ffffff';
+  context.lineWidth = 16;
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+  context.beginPath();
+  context.moveTo(36, 72);
+  context.lineTo(64, 40);
+  context.lineTo(92, 72);
+  context.moveTo(64, 42);
+  context.lineTo(64, 96);
+  context.stroke();
+  upgradeBadgeTexture = new THREE.CanvasTexture(canvas);
+  upgradeBadgeTexture.colorSpace = THREE.SRGBColorSpace;
+  return upgradeBadgeTexture;
+}
+
+function buildUpgradeBadge(definition, level, worldScale) {
+  const cfg = TWR.upgradeBadge;
+  const badge = new THREE.Sprite(new THREE.SpriteMaterial({ map: getUpgradeBadgeTexture(), transparent: true, depthTest: false, depthWrite: false }));
+  const height = rigDefinitions[definition.model.rigs[level]].height * getTowerSize(definition, level);
+  badge.position.y = (height + cfg.yMargin) * worldScale;
+  badge.scale.setScalar(cfg.size * worldScale);
+  badge.renderOrder = cfg.renderOrder;
+  badge.visible = false;
+  return badge;
+}
+
+/** Hay dinero para evolucionar el ataque de la torre, y no está destruida ni en su nivel máximo. */
+export function canAffordUpgrade(state, tower, definition) {
+  const cost = definition.levels[tower.level]?.upgradeCost;
+  return !tower.destroyed && cost != null && state.credits >= cost;
+}
+
 // Quita una torre de la escena. Sus efectos de daño y su barra de vida son suyos; el modelo y los
 // restos son copias que comparten geometría y materiales con su plantilla.
 function removeTowerEntry(scene, entry) {
   scene.remove(entry.root);
   disposeOwnedMeshes(entry.damageFx);
   disposeOwnedMeshes(entry.hpBar.group);
+  entry.upgradeBadge.material.dispose();
 }
 
 export class TowerRenderer {
@@ -274,9 +325,11 @@ export class TowerRenderer {
         root.add(wreck);
         root.add(damageFx);
         root.add(hpBar.group);
+        const upgradeBadge = buildUpgradeBadge(this.towerDefinitions[tower.towerTypeId], tower.level, this.worldScale);
+        root.add(upgradeBadge);
         this.scene.add(root);
 
-        entry = { root, mesh, wreck, damageFx, level: tower.level, hpBar, wasDestroyed: tower.destroyed, armorTier: 0, armor: null };
+        entry = { root, mesh, wreck, damageFx, level: tower.level, hpBar, upgradeBadge, wasDestroyed: tower.destroyed, armorTier: 0, armor: null };
         this.meshes.set(tower.id, entry);
       }
       if (entry.armorTier !== tower.defenseTier) this.syncArmor(entry, tower);
@@ -326,6 +379,13 @@ export class TowerRenderer {
       if (tower.destroyed) entry.hpBar.group.visible = false;
       if (entry.hpBar.group.visible && camera) {
         entry.hpBar.group.quaternion.copy(camera.quaternion);
+      }
+
+      entry.upgradeBadge.visible = canAffordUpgrade(state, tower, this.towerDefinitions[tower.towerTypeId]);
+      if (entry.upgradeBadge.visible) {
+        const { blinkHz, minOpacity } = TWR.upgradeBadge;
+        const wave = 0.5 + 0.5 * Math.cos(elapsedTime * blinkHz * Math.PI * 2);
+        entry.upgradeBadge.material.opacity = minOpacity + (1 - minOpacity) * wave;
       }
 
       if (entry.damageFx.visible) {

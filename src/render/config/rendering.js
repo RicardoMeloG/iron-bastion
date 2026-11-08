@@ -226,6 +226,10 @@ export const RENDERING_CONFIG = {
       backgroundOpacity: 0.85,
       renderOrder: 1420,
     },
+    // Flecha sobre la torre cuando alcanza el dinero para evolucionar su ataque: titila para que
+    // se note (un tester llegó a la oleada 18 sin evolucionar ninguna). Medidas en celdas, sobre
+    // lo más alto del modelo; `blinkHz`, parpadeos por segundo; la opacidad va de `minOpacity` a 1.
+    upgradeBadge: { size: 0.6, yMargin: 0.55, blinkHz: 1.6, minOpacity: 0.25, color: '#22c55e', renderOrder: 1430 },
   },
 };
 

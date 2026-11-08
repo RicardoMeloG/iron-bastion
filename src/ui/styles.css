@@ -1725,6 +1725,9 @@ body.overlay-active #panel {
   .tower-card .versus-chip { display: none; }
   /* La elegida ya lleva el borde dorado: la etiqueta, partida en dos líneas, tapaba la imagen. */
   .tower-card.active:not(.standby) .tower-card-tag { display: none; }
+  /* Con el botón ⛶ (fuera de pantalla completa) los botones del HUD se salían por la derecha. */
+  .hud-actions { gap: 4px; }
+  .hud-btn { padding: 5px 7px; font-size: 10px; gap: 4px; }
   /* «CONSTRUIR 10/14» no cabía en la columna. */
   .side-title { font-size: 13px; letter-spacing: 0; gap: 4px; }
   /* Solo íconos y cifras, en una fila: con los nombres, se apilaban y «Créditos» quedaba cortado. */
@@ -1746,4 +1749,9 @@ body.overlay-active #panel {
     border-radius: 0 0 8px 8px;
   }
   #wave-countdown { font-size: 20px; }
+}
+
+/* En un teléfono no hay tecla P: la pausa se quita con el botón «Continuar». */
+@media (hover: none) and (pointer: coarse) {
+  .pause-key { display: none; }
 }

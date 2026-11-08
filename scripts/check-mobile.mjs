@@ -63,6 +63,14 @@ try {
     }
     if (rotateNotice) problems.push(`${phone.name}: el aviso para girar tapa el juego`);
 
+    // Fuera de pantalla completa aparece el botón ⛶: con él, los botones del HUD deben caber, y en
+    // su peor caso, en pausa, cuando «Pausa» pasa a decir «Continuar».
+    await page.evaluate(() => window.__game.setPaused(true));
+    const hudOverflow = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('#hud .hud-btn')]
+      .filter((button) => !button.hidden)
+      .map((button) => Math.ceil(button.getBoundingClientRect().right - window.innerWidth))));
+    await page.evaluate(() => window.__game.setPaused(false));
+    if (phone.name !== 'vertical' && hudOverflow > 0) problems.push(`${phone.name}: los botones del HUD se salen ${hudOverflow} px por la derecha`);
     // Entrar con «Jugar» como un jugador: en un teléfono, ese toque pide la pantalla completa.
     await page.evaluate(() => window.__game.setMuted(true));
     await page.getByText('Jugar', { exact: true }).tap();
