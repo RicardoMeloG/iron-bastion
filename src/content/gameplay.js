@@ -55,6 +55,8 @@ export const GAMEPLAY_CONFIG = {
       { fromWave: 14, chances: [0.35, 0.4, 0.2, 0.05] },
       { fromWave: 16, chances: [0.1, 0.4, 0.35, 0.15] },
       { fromWave: 18, chances: [0, 0.3, 0.4, 0.3] },
+      // La oleada final: todos los vehículos con veteranía 3 (Ricardo, 14-11-2026).
+      { fromWave: 20, chances: [0, 0, 0, 1] },
     ],
     // Las unidades de soldados: son las primeras veteranas, y el nivel 0 queda para las primeras oleadas.
     squadOdds: [
@@ -116,9 +118,11 @@ export const GAMEPLAY_CONFIG = {
       { 'infantry-mg': 54, 'moto-recon': 7, patrulla: 15, 'apc-8x8': 3, 'truck-transport': 6, 'tank-heavy': 3, 'dron-fpv': 7, 'dron-ala': 3 },
       { 'infantry-mg': 63, 'moto-recon': 9, patrulla: 16, 'apc-8x8': 4, 'truck-transport': 6, 'tank-heavy': 4, 'dron-fpv': 8, 'dron-ala': 4 },
       // La 19 y la 20 son el cierre: menos infantería a pie y más drones y blindados (Ricardo, 07-11-2026).
-      // La 20 trae lo más pesado: con la defensa con la que él ganó, le destruye unas 13 torres.
+      // La 20 es especial (Ricardo, 14-11-2026): 24 tanques, 28 drones FPV y 22 de ala delta, todos con
+      // veteranía 3. Medido repitiendo su victoria del 14-11 (19 vidas, $2541 de sobra) sin que gaste más:
+      // con 12 tanques no perdía vidas, con 24 termina con 5 y con 30 pierde. El bot que gana, pierde con 24.
       { 'infantry-mg': 54, 'moto-recon': 7, patrulla: 15, 'apc-8x8': 5, 'truck-transport': 6, 'tank-heavy': 5, 'dron-fpv': 12, 'dron-ala': 8 },
-      { 'infantry-mg': 36, 'moto-recon': 4, patrulla: 10, 'apc-8x8': 10, 'truck-transport': 6, 'tank-heavy': 12, 'dron-fpv': 18, 'dron-ala': 14 },
+      { 'tank-heavy': 24, 'dron-fpv': 28, 'dron-ala': 22 },
     ],
   },
 

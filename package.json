@@ -1,6 +1,6 @@
 {
   "name": "iron-bastion",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Iron Bastion: tower defense militar en 3D para el navegador (Three.js)",
   "type": "module",
   "scripts": {

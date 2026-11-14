@@ -17,7 +17,7 @@
           <div>
             <span class="hud-stat"><svg class="hud-icon" viewBox="0 0 20 20"><ellipse cx="10" cy="14.5" rx="7" ry="3" fill="#b8860b"/><ellipse cx="10" cy="10.5" rx="7" ry="3" fill="#d9a514"/><ellipse cx="10" cy="6.5" rx="7" ry="3" fill="#facc15"/></svg><span class="hud-label">Créditos </span><span class="hud-val" id="credits">250</span></span>
             <span class="hud-stat"><svg class="hud-icon" viewBox="0 0 20 20" fill="none" stroke="#dbe5ef" stroke-width="1.8" stroke-linecap="round"><path d="M2 6c3-3 5 3 8 0s5 3 8 0M2 11c3-3 5 3 8 0s5 3 8 0M2 16c3-3 5 3 8 0s5 3 8 0"/></svg><span class="hud-label">Oleada </span><span class="hud-val" id="wave">0</span>/<span id="wave-total"></span></span>
-            <span class="hud-stat"><svg class="hud-icon" viewBox="0 0 20 20" fill="#dbe5ef"><path d="M10 2c-4.2 0-7 2.9-7 6.6 0 2.4 1.1 4 2.8 5v2.2c0 .6.5 1.2 1.2 1.2h6c.7 0 1.2-.6 1.2-1.2v-2.2c1.7-1 2.8-2.6 2.8-5C17 4.9 14.200 2 10 2z"/><circle cx="7" cy="9" r="1.9" fill="#0d1a2b"/><circle cx="13" cy="9" r="1.9" fill="#0d1a2b"/></svg><span class="hud-label">Enemigos </span><span class="hud-val" id="enemy-count">0</span></span>
+            <span class="hud-stat"><svg class="hud-icon" viewBox="0 0 20 20" fill="#dbe5ef"><path d="M10 2c-4.2 0-7 2.9-7 6.6 0 2.4 1.1 4 2.8 5v2.2c0 .6.5 1.2 1.2 1.2h6c.7 0 1.2-.6 1.2-1.2v-2.2c1.7-1 2.8-2.6 2.8-5C17 4.9 14.200 2 10 2z"/><circle cx="7" cy="9" r="1.9" fill="#0d1a2b"/><circle cx="13" cy="9" r="1.9" fill="#0d1a2b"/></svg><span class="hud-label">Enemigos </span><span class="hud-val" id="enemy-count">0</span></span><span class="hud-stat hud-score" title="Puntaje (se mide en tiempo de juego: acelerar no da ventaja)"><span class="hud-label">Puntaje </span><span class="hud-val" id="score">0</span><span id="score-pops" aria-hidden="true"></span></span>
           </div>
           <div id="life-bar-wrap">
             <div id="life-bar-outer"><div id="life-bar-fill"></div></div>
@@ -81,9 +81,15 @@
 
       <div id="pause-banner" hidden>Pausa<span class="pause-key"> · P para continuar</span></div>
 
+      <div id="first-hint" role="status" hidden>
+        <p id="first-hint-text"></p>
+        <button id="first-hint-close" type="button" aria-label="Cerrar consejo">✕</button>
+      </div>
+
       <div id="overlay">
         <h2 id="overlay-title"></h2>
         <p id="overlay-text"></p>
+        <ul id="score-summary" class="score-summary" hidden></ul>
         <button id="overlay-retry" style="background:#22C55E" onclick="window.resetWave()">Reintentar la oleada</button>
         <button style="background:#3B82F6" onclick="window.resetAll()">Jugar de nuevo</button>
       </div>
@@ -106,9 +112,10 @@
             <li><b>Rueda</b>: zoom · <b>botón derecho</b>: mover el mapa · <b>botón central</b>: girarlo · <b>M</b>: sonido · <b>P</b>: pausa · <b>V</b>: velocidad.</li>
           </ul>
           <button id="start-btn" type="button">Jugar</button>
+          <p id="best-score" class="start-best" hidden></p>
           <label id="registro-consent" class="start-consent" hidden>
             <input type="checkbox" id="registro-consent-check" />
-            Compartir el registro de mis partidas (compras, oleadas, daño y tiempos; sin datos personales) para ajustar la dificultad.
+            Compartir el registro de mis partidas (compras, oleadas, órdenes, daño, tiempos y errores; sin datos personales ni cookies; se borra a los 12 meses) para ajustar la dificultad.
           </label>
           <details class="start-credits">
             <summary>Créditos</summary>

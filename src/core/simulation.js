@@ -379,8 +379,9 @@ function livesCostOf(state, enemy) {
 
 function leakEnemy(state, enemy) {
   enemy.alive = false;
-  state.lives -= livesCostOf(state, enemy);
-  queueEffect(state, { type: 'enemy-leaked', enemyId: enemy.id, enemyTypeId: enemy.enemyTypeId, fireDelaySeconds: enemy.fireDelaySeconds ?? 0 });
+  const livesLost = livesCostOf(state, enemy);
+  state.lives -= livesLost;
+  queueEffect(state, { type: 'enemy-leaked', enemyId: enemy.id, enemyTypeId: enemy.enemyTypeId, fireDelaySeconds: enemy.fireDelaySeconds ?? 0, livesLost });
   markUiDirty(state);
 
   if (state.lives <= 0) {
@@ -1486,7 +1487,9 @@ export function startWave(state, options = {}) {
 
   state.waveSnapshot = createWaveSnapshot(state);
   for (const tower of state.towers) tower.spentSinceLastWave = 0;
+  const countdownLeft = state.waveCountdown ?? 0;
   state.waveCountdown = null;
+  state.waveSeconds = 0;
   state.activeWaveDefinition = waveDefinition;
   state.wave += 1;
   state.waveActive = true;
@@ -1497,7 +1500,7 @@ export function startWave(state, options = {}) {
   state.spawnGaps = {};
   state.spawnedThisWave = 0;
   state.leakedTeams = [];
-  queueEffect(state, { type: 'wave-started', wave: state.wave, spawns: [...state.spawnQueue], lives: state.lives, credits: state.credits });
+  queueEffect(state, { type: 'wave-started', wave: state.wave, spawns: [...state.spawnQueue], lives: state.lives, credits: state.credits, countdownLeft });
   markUiDirty(state);
   markWorldDirty(state);
   return true;
@@ -1628,6 +1631,7 @@ function applyTowerDamage(state, projectile, tower, damage, rawDamage, splash) {
     queueEffect(state, {
       type: 'tower-destroyed',
       towerId: tower.id,
+      invested: tower.invested,
       position: { x: tower.wx, y: state.config.pathSurfaceY + state.config.worldScale * 0.16, z: tower.wz },
       color: 0xff7733,
       count: 8,
@@ -1780,6 +1784,7 @@ function killEnemy(state, target, towerId) {
     // Cuánto lo retrasó el napalm en su vida (s).
     fireDelaySeconds: target.fireDelaySeconds ?? 0,
     reward: target.reward,
+    veterancy: target.veterancy ?? 0,
     towerId,
   });
   dismountCrew(state, target);
@@ -2158,6 +2163,8 @@ export function tickSimulation(state, dt) {
     };
   }
 
+  if (state.waveActive) state.waveSeconds += clampedDt;
+
   if (state.spawnQueue.length > 0) {
     state.spawnTimer -= clampedDt;
     for (const enemyTypeId of Object.keys(state.spawnGaps)) state.spawnGaps[enemyTypeId] -= clampedDt;
@@ -2217,7 +2224,7 @@ export function tickSimulation(state, dt) {
     state.fireZones = [];
     state.waveCountdown = GAMEPLAY_CONFIG.waves.countdown.betweenSeconds;
     reviveTowersAfterWave(state);
-    queueEffect(state, { type: 'wave-ended', wave: state.wave, lives: state.lives, credits: state.credits });
+    queueEffect(state, { type: 'wave-ended', wave: state.wave, lives: state.lives, credits: state.credits, seconds: state.waveSeconds });
     markUiDirty(state);
 
     if (state.wave >= state.config.waveSet.waves.length && state.lives > 0) {

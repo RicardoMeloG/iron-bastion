@@ -31,6 +31,9 @@ jobs:
       - run: npm run check:boundaries
       - run: npm run check:rigs
       - run: npm run build
+        env:
+          # Registro de partidas con permiso del jugador (spec 003, M1; receptor: obsidian-cube spec 015).
+          VITE_REGISTRO_URL: https://ricardomelog.com/api/iron-bastion/partidas
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

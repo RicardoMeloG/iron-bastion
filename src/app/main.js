@@ -1,14 +1,17 @@
 import * as THREE from 'three';
 import {
+  applyOrder,
   clearCover,
   getSellRefund,
   consumeEffects,
   createFixedStepper,
   createGameConfig,
   createInitialState,
+  createScore,
   worldToGrid,
   resetAll,
   resetWave,
+  scoreEffects,
   placeTower,
   sellTower,
   startWave,
@@ -17,6 +20,8 @@ import {
   upgradeTower,
   upgradeTowerDefense,
 } from '../core/index.js';
+import { ScorePresenter } from '../ui/score-presenter.js';
+import { loadBestScore, saveBestScore } from './best-score.js';
 import { GAMEPLAY_CONFIG } from '../content/gameplay.js';
 import { FRAMING_CONFIG } from '../render/config/framing.js';
 import { HudPresenter } from '../ui/hud-presenter.js';
@@ -29,6 +34,8 @@ import { SfxPlayer } from '../audio/sfx-player.js';
 import { createAudioDirector } from './audio-director.js';
 import { SOUND_FILES } from './sound-files.js';
 import { createMatchRecorder } from './match-recorder.js';
+import { createFirstMinuteHints } from './first-minute-hints.js';
+import { HintPresenter } from '../ui/hint-presenter.js';
 import { createLayoutCoordinator } from '../ui/layout-coordinator.js';
 import { TowerPreview } from '../render/tower-preview.js';
 import { EnemyRenderer } from '../render/enemy-renderer.js';
@@ -78,7 +85,10 @@ const projectileRenderer = new ProjectileRenderer(sceneRuntime.scene, config.wor
 // Los restos de los vehículos destruidos echan humo con las partículas de los proyectiles.
 const enemyRenderer = new EnemyRenderer(sceneRuntime.scene, config.enemyDefinitions, config.worldScale, projectileRenderer);
 const audioDirector = createAudioDirector(sfxPlayer);
-const matchRecorder = createMatchRecorder();
+// Ventana privada o almacenamiento bloqueado: sin localStorage no se guarda nada.
+const browserStorage = (() => { try { return window.localStorage; } catch { return null; } })();
+const matchRecorder = createMatchRecorder({ storage: browserStorage, seed: GAMEPLAY_CONFIG.waves.seed, fixedStep: GAMEPLAY_CONFIG.simulation.fixedStep });
+matchRecorder.listenForErrors(window);
 // En la versión publicada, compartir partidas es opcional y empieza desmarcado; la elección se recuerda.
 if (matchRecorder.canShareRemotely) {
   const CONSENT_KEY = 'iron-bastion:registro';
@@ -102,6 +112,24 @@ const panelPresenter = new TowerPanelPresenter(document, towerPreview);
 const towerQuickActions = new TowerQuickActions(document);
 const rockQuickActions = new RockQuickActions(document);
 const towerSelector = new TowerSelector(document, config.towerDefinitions, config.enemyDefinitions, (towerTypeId) => selectBuildTower(towerTypeId));
+
+// Los dos consejos del primer minuto (spec 003, M3): uno por navegador, se cierran con ✕.
+const hintPresenter = new HintPresenter(document);
+const firstMinuteHints = createFirstMinuteHints({
+  storage: browserStorage,
+  show: (id, text) => hintPresenter.show(id, text),
+  hide: () => hintPresenter.hide(),
+});
+hintPresenter.onClose(() => firstMinuteHints.dismiss());
+
+// Puntaje local (spec 003, S1): sale de los eventos del núcleo, en tiempo de simulación, así que la
+// velocidad x2 o x3 no da ventaja. El mejor queda en este navegador (localStorage); no hay tabla mundial.
+const scorePresenter = new ScorePresenter(document);
+let score = createScore();
+// Al reintentar una oleada se vuelve al puntaje con que empezó.
+let scoreAtWaveStart = structuredClone(score);
+let scoreDeveloperMode = false;
+scorePresenter.showBest(loadBestScore(browserStorage));
 
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
@@ -339,7 +367,8 @@ function followSelectedObstacle() {
 }
 
 window.doClearObstacle = function doClearObstacleHandler() {
-  if (clearCover(state, selectedObstacleId)) {
+  const obstacle = getSelectedObstacle();
+  if (obstacle && issueOrder({ tipo: 'despejar', celda: [obstacle.gx, obstacle.gy] })) {
     selectedObstacleId = null;
     renderUi();
   }
@@ -553,22 +582,40 @@ startButtonEl.addEventListener('click', () => {
   enterFullscreen();
   closeStartScreen();
 });
-document.getElementById('help-btn').addEventListener('click', openStartScreen);
+document.getElementById('help-btn').addEventListener('click', () => { matchRecorder.noteHelpOpened(); openStartScreen(); });
 openStartScreen();
 
-window.startWave = function startWaveHandler() {
+// Toda orden del jugador pasa por aquí (spec 003): se aplica al núcleo con la misma función que usa la
+// repetición sin pantalla y, si el núcleo la acepta, el registro la guarda con su paso de simulación.
+function issueOrder(order) {
+  if (!applyOrder(state, order)) return false;
+  const { tipo, ...details } = order;
+  matchRecorder.order(state, tipo, details);
+  if (tipo === 'reintentar') { score = structuredClone(scoreAtWaveStart); scorePresenter.render(score.total); scorePresenter.hideSummary(); }
+  return true;
+}
+
+function launchWave(byPlayer) {
   setPaused(false);
   syncDeveloperCredits();
   const overrideWaveDefinition = buildDevWaveOverride();
-  if (startWave(state, { overrideWaveDefinition })) {
-    renderUi();
+  if (overrideWaveDefinition) {
+    if (startWave(state, { overrideWaveDefinition })) {
+      if (byPlayer) matchRecorder.order(state, 'oleada', {});
+      renderUi();
+    }
+  } else if (byPlayer) {
+    if (issueOrder({ tipo: 'oleada' })) renderUi();
+  } else {
+    if (startWave(state)) renderUi();
   }
-};
+}
+
+window.startWave = () => launchWave(true);
 
 window.resetWave = function resetWaveHandler() {
   if (!state.waveActive) return;
-  matchRecorder.note('reintentar oleada', { oleada: state.wave });
-  resetWave(state);
+  issueOrder({ tipo: 'reintentar' });
   syncDeveloperCredits();
   setPaused(false);
   closeConfirmDialog();
@@ -588,6 +635,7 @@ window.askResetWave = function askResetWaveHandler() {
 window.resetAll = function resetAllHandler() {
   const keepDeveloperMode = Boolean(devModeToggleEl?.checked);
   matchRecorder.restart();
+  score = createScore(); scoreAtWaveStart = structuredClone(score); scoreDeveloperMode = false; scorePresenter.render(0); scorePresenter.hideSummary();
   resetAll(state);
   if (keepDeveloperMode) {
     setDeveloperMode(true);
@@ -610,17 +658,13 @@ window.askResetAll = function askResetAllHandler() {
 };
 
 window.doUpgrade = function doUpgradeHandler() {
-  if (!state.selectedTowerId) return;
-  if (upgradeTower(state, state.selectedTowerId)) {
-    renderUi();
-  }
+  const tower = getSelectedTower();
+  if (tower && issueOrder({ tipo: 'ataque', celda: [tower.gx, tower.gy] })) renderUi();
 };
 
 window.doUpgradeDefense = function doUpgradeDefenseHandler() {
-  if (!state.selectedTowerId) return;
-  if (upgradeTowerDefense(state, state.selectedTowerId)) {
-    renderUi();
-  }
+  const tower = getSelectedTower();
+  if (tower && issueOrder({ tipo: 'blindaje', celda: [tower.gx, tower.gy] })) renderUi();
 };
 
 window.askSell = function askSellHandler() {
@@ -632,7 +676,7 @@ window.askSell = function askSellHandler() {
     title: `Vender ${definition.displayName}?`,
     text: `Nivel ${tower.level + 1} · ${stats.label} · ${tower.kills} kills`,
     amount: `+ $${getSellRefund(definition, tower)}`,
-    onConfirm: () => sellTower(state, tower.id),
+    onConfirm: () => issueOrder({ tipo: 'vender', celda: [tower.gx, tower.gy] }),
   });
 };
 
@@ -709,8 +753,7 @@ sceneRuntime.renderer.domElement.addEventListener('click', (event) => {
       deselectTower();
       return;
     }
-    const tower = placeTower(state, { towerTypeId: state.buildTowerTypeId, gx: hoveredCell.gx, gy: hoveredCell.gy });
-    if (tower) renderUi();
+    if (issueOrder({ tipo: 'torre', torre: state.buildTowerTypeId, celda: [hoveredCell.gx, hoveredCell.gy] })) renderUi();
     return;
   }
 
@@ -851,6 +894,21 @@ function presentSimulation() {
   enemyRenderer.sync(state, sceneRuntime.camera, sceneRuntime.cameraAngle, elapsedTime);
   projectileRenderer.syncProjectiles(state);
   const effects = consumeEffects(state);
+  if (effects.some((effect) => effect.type === 'wave-started')) scoreAtWaveStart = structuredClone(score);
+  const pops = scoreEffects(score, effects);
+  if (state.developerMode.enabled) scoreDeveloperMode = true;
+  if (pops.length > 0) {
+    // Un solo «+N» por cuadro: con muchas bajas a la vez no se llena la pantalla.
+    const points = pops.reduce((sum, item) => sum + item.points, 0);
+    if (points !== 0) scorePresenter.pop(points);
+    scorePresenter.render(score.total);
+  }
+  if (effects.some((effect) => effect.type === 'game-ended')) {
+    // Una partida con el modo desarrollo no cuenta para el mejor puntaje.
+    const { best, isNew } = scoreDeveloperMode ? { best: loadBestScore(browserStorage), isNew: false } : saveBestScore(browserStorage, score.total);
+    scorePresenter.showSummary(score, best, isNew);
+    scorePresenter.showBest(best);
+  }
   projectileRenderer.handleEffects(effects, towerRenderer, enemyRenderer);
   enemyRenderer.handleEffects(effects);
   audioDirector.handleEffects(effects);
@@ -868,7 +926,8 @@ function gameLoop() {
   const steps = paused ? 0 : stepper.advance(frameSeconds, simulationSpeed);
   for (let step = 0; step < steps; step++) {
     tickSimulation(state, SIM.fixedStep);
-    if (tickWaveCountdown(state, SIM.fixedStep)) window.startWave();
+    matchRecorder.tick();
+    if (tickWaveCountdown(state, SIM.fixedStep)) launchWave(false);
     // Los eventos de un paso se muestran con las unidades como estaban en ese paso: el fogonazo
     // sale de la boca, aunque el cuadro traiga más pasos.
     if (state.effects.length > 0 && step < steps - 1) presentSimulation();
@@ -880,6 +939,7 @@ function gameLoop() {
   if (state.uiDirty) {
     renderUi();
   }
+  firstMinuteHints.update(state, { blocked: isModalOpen() });
 
   followSelectedTower();
   followSelectedObstacle();
@@ -892,6 +952,8 @@ function gameLoop() {
 if (import.meta.env.DEV) {
   window.__game = {
     state,
+    // Órdenes por la misma vía que el jugador: quedan en el registro y se pueden repetir.
+    order: issueOrder,
     core: { placeTower, startWave, upgradeTower, upgradeTowerDefense, sellTower, clearCover, resetWave, resetAll },
     renderers: { enemyRenderer, towerRenderer, projectileRenderer },
     camera: sceneRuntime.camera,

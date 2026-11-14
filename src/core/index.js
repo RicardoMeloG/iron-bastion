@@ -1,6 +1,7 @@
 export { createGameConfig } from './config.js';
 export { gridToWorld, worldToGrid } from './coordinates.js';
 export { createFixedStepper } from './fixed-step.js';
+export { SCORE_CATEGORIES, createScore, scoreEffects } from './score.js';
 export { estimateTowerEffectiveness, summarizeWave } from './insights.js';
 export {
   cloneStateValue,
@@ -26,3 +27,4 @@ export {
   upgradeTower,
   upgradeTowerDefense,
 } from './simulation.js';
+export { applyOrder } from './orders.js';

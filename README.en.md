@@ -11,11 +11,12 @@ A military 3D tower defense game for the browser, built with Three.js. Columns o
 ## How to play
 
 - **Four towers**, from the bar or with keys 1 to 4. Each has five attack levels, each with its own look, and three armor levels:
-  - **MG-7** ($60): machine gun against infantry and light vehicles; at level 5, a gatling.
-  - **LM-2** ($150): missile launcher against armor; fires its full magazine, then reloads.
-  - **RK-40** ($140): arcing incendiary rockets; the napalm burns infantry and slows vehicles down.
-  - **AA-3** ($110): anti-aircraft, drones only.
-- **Twenty waves**, each heavier than the last: three-soldier squads (machine guns and RPGs), motorbikes, armed patrol vehicles, trucks that unload troops, 8x8 APCs, tanks with an active defense system that intercepts missiles, and FPV and delta-wing drones.
+  - **MG-7** ($55): machine gun against infantry and light vehicles; at level 5, a gatling.
+  - **LM-2** ($135): missile launcher against armor; fires its full magazine, then reloads.
+  - **RK-40** ($125): arcing incendiary rockets; the napalm burns infantry and slows vehicles down.
+  - **AA-3** ($100): anti-aircraft, drones only.
+- **Twenty waves**, each heavier than the last: three-soldier squads (machine guns and RPGs), motorbikes, armed patrol vehicles, trucks that unload troops, 8x8 APCs, tanks with an active defense system that intercepts missiles, and FPV and delta-wing drones. The last one is special: only tanks and drones, all at the highest veterancy.
+- **Score:** points for enemies destroyed, waves cleared, waves without losing lives, calling waves early and finishing fast; minus towers and lives lost. It is measured in game time, so speeding up gives no advantage. Your best score is kept in your browser.
 - **Cover:** on the road a soldier dies in one shot; on grass he dodges some bullets; behind a rock, tree or bush, part of the shots hit the cover instead. Lying prone, even more so.
 - **Veterancy:** enemies that destroy towers level up and gain abilities, not just health.
 - **Wheel**: zoom · **right button**: pan the map · **middle button**: rotate it · **M**: sound · **P**: pause · **V**: speed.
@@ -57,7 +58,24 @@ All audio is public-domain (CC0) recordings from Freesound, picked by listening 
 
 The simulation runs without a browser, so a whole game can be simulated (`npm run simulate`) and measured. On top of that, every game played locally is recorded (`npm run registro`): damage by weapon and armor, accuracy, economy, enemies on screen, grenades and how much the napalm delays vehicles. Changes come from that data: the LM-2 reload, the end of the game and cover were adjusted after real games.
 
-**In progress:** the simulator doesn't yet reproduce a person's games well, and 5 balance tests are paused until it is calibrated.
+Every game keeps the seed and the player's orders, and the simulator **replays it exactly** (`npm run simulate -- --repetir <logs>`): a real 20-wave victory, 17 minutes of play, comes out the same step by step. So every change is tested against real games, not a bot.
+
+**Game logging, with your permission:** on the start screen you can agree to share your games. An anonymous summary is sent (waves, towers, orders, JavaScript errors), with no cookies or personal data, and deleted after 12 months. It shows where people get stuck. If you don't agree, nothing is sent.
+
+## Version 1.0
+
+Out of beta on 2026-11-14, with a frozen scope: anything not here is a separate project.
+
+- Local score with an end-of-game summary and your best score on the start screen.
+- A special wave 20: 24 tanks, 28 FPV drones and 22 delta-wing drones, all at veterancy 3.
+- Two first-minute hints: place a tower, then upgrade it.
+- Game logging with permission and exact replay in the simulator.
+
+### Known issues and behaviors
+
+- **Machine gun dead zone:** soldiers hugging the sandbag ring are closer to the center than the muzzle, so the bullets miss them. Kept on purpose: a raised mount can't depress the barrel to its own base, and it rewards infantry that reach the tower to throw grenades.
+- **Score on a landscape phone:** the counter wraps to a second line of the HUD.
+- **Balance is measured with real games:** if the data shows a wall at some wave, a 1.0.x release will adjust it.
 
 ## Architecture
 

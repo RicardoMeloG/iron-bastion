@@ -61,15 +61,18 @@ test('en territorio enemigo no se construye, y ninguna torre alcanza el punto de
 test('la masa crece hasta la oleada 18; el cierre cambia soldados a pie por vehículos y drones', () => {
   const { waves } = defaultWaveSetDefinition;
   const total = (wave) => wave.spawns.reduce((sum, id) => sum + 1 + (GAME_ENEMIES[id].dismount?.length ?? 0), 0);
-  assert.deepEqual(waves.map(total), [9, 12, 18, 25, 34, 41, 55, 62, 65, 75, 79, 81, 89, 96, 110, 129, 148, 168, 162, 154]);
+  assert.deepEqual(waves.map(total), [9, 12, 18, 25, 34, 41, 55, 62, 65, 75, 79, 81, 89, 96, 110, 129, 148, 168, 162, 74]);
   const heavy = (wave) => wave.spawns.filter((id) => !id.startsWith('infantry-')).length;
   assert.ok(heavy(waves[18]) > heavy(waves[17]) && heavy(waves[19]) > heavy(waves[18]), 'la 19 y la 20 traen cada vez más vehículos y drones');
   const tanks = (wave) => wave.spawns.filter((id) => id === 'tank-heavy').length;
   assert.equal(Math.max(...waves.map(tanks)), tanks(waves[19]), 'la última trae la mayor cantidad de tanques');
 });
 
-test('todas las oleadas traen soldados a pie', () => {
-  for (const wave of defaultWaveSetDefinition.waves) {
+test('todas las oleadas traen soldados a pie, salvo la 20, que es solo tanques y drones', () => {
+  const { waves } = defaultWaveSetDefinition;
+  // La oleada final es especial (Ricardo, 14-11-2026): solo tanques y drones.
+  assert.deepEqual([...new Set(waves[19].spawns)].sort(), ['dron-ala', 'dron-fpv', 'tank-heavy']);
+  for (const wave of waves.slice(0, 19)) {
     assert.ok(wave.spawns.some((id) => id.startsWith('infantry-')), wave.id);
   }
 });
@@ -83,7 +86,7 @@ test('cada oleada suma algo: infantería, motos, vehículos, blindados y tanques
   ].map(firstWaveWith), [1, 3, 4, 5, 8, 11]); // el primer tanque, en la 11 y solo (14-11-2026)
   assert.equal(firstWaveWith('dron-fpv'), 7, 'los drones empiezan en la 7');
   // Desde que aparecen, las motos están en todas.
-  for (const wave of waves.slice(2)) assert.ok(wave.spawns.includes('moto-recon'), wave.id);
+  for (const wave of waves.slice(2, 19)) assert.ok(wave.spawns.includes('moto-recon'), wave.id);
   // Lo que hay que destruir (la vida que traen) nunca baja, salvo donde cambia la amenaza: la 9 y la 11
   // traen menos blindados a cambio de otra cosa (tanques y drones), y la 11 empieza a sumar vida a todos.
   const toughness = waves.map((wave) => wave.spawns.reduce((sum, id) => sum + GAME_ENEMIES[id].stats.hp, 0));

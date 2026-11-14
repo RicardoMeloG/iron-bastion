@@ -11,11 +11,12 @@ Tower defense militar en 3D para el navegador, hecho con Three.js. Por el camino
 ## Cómo se juega
 
 - **Cuatro torres**, en la barra o con las teclas 1 a 4. Cada una tiene cinco niveles de ataque, con aspecto propio, y tres de blindaje:
-  - **MG-7** ($60): ametralladora contra infantería y vehículos ligeros; en el nivel 5, una gatling.
-  - **LM-2** ($150): lanzamisiles contra blindados; dispara su cargador y recarga.
-  - **RK-40** ($140): cohetes incendiarios en arco; el napalm quema la infantería y frena a los vehículos.
-  - **AA-3** ($110): antiaérea, solo contra drones.
-- **Veinte oleadas**, cada vez más pesadas: escuadras de tres soldados (ametralladoras y RPG), motos, patrullas armadas, camiones que sueltan tropas, blindados 8x8, tanques con defensa activa que intercepta misiles, y drones FPV y de ala delta.
+  - **MG-7** ($55): ametralladora contra infantería y vehículos ligeros; en el nivel 5, una gatling.
+  - **LM-2** ($135): lanzamisiles contra blindados; dispara su cargador y recarga.
+  - **RK-40** ($125): cohetes incendiarios en arco; el napalm quema la infantería y frena a los vehículos.
+  - **AA-3** ($100): antiaérea, solo contra drones.
+- **Veinte oleadas**, cada vez más pesadas: escuadras de tres soldados (ametralladoras y RPG), motos, patrullas armadas, camiones que sueltan tropas, blindados 8x8, tanques con defensa activa que intercepta misiles, y drones FPV y de ala delta. La última es especial: solo tanques y drones, todos con la veteranía más alta.
+- **Puntaje:** suma por enemigos destruidos, oleadas superadas, oleadas sin perder vidas, adelantarse y terminar rápido; resta por torres y vidas perdidas. Se mide en tiempo de juego, así que acelerar no da ventaja. El mejor puntaje queda guardado en tu navegador.
 - **Cobertura:** en la calle un soldado muere de un disparo; en el pasto esquiva algunas balas; tras una roca, un árbol o un arbusto, parte de los disparos le pega a la cobertura. Cuerpo a tierra, más todavía.
 - **Veteranía:** los enemigos que destruyen torres suben de nivel y ganan capacidades, no solo vida.
 - **Rueda**: zoom · **botón derecho**: mover el mapa · **botón central**: girarlo · **M**: sonido · **P**: pausa · **V**: velocidad.
@@ -57,7 +58,24 @@ Todo el audio son grabaciones de Freesound en dominio público (CC0), elegidas e
 
 El núcleo corre sin navegador, así que una partida entera se puede simular (`npm run simulate`) y medir. Además, cada partida jugada en local queda registrada (`npm run registro`): daño por arma y blindaje, puntería, economía, enemigos a la vez, granadas y cuánto retrasa el napalm a los vehículos. Los ajustes salen de esos datos: la recarga de la LM-2, el cierre de la partida y la cobertura se cambiaron después de partidas reales.
 
-**En curso:** el simulador todavía no reproduce bien las partidas de una persona, y 5 pruebas de balance están en pausa hasta calibrarlo.
+Cada partida guarda la semilla y las órdenes del jugador, y el simulador la **repite exacta** (`npm run simulate -- --repetir <registros>`): una victoria real de 20 oleadas, 17 minutos de juego, sale igual paso a paso. Con eso, cada ajuste se prueba contra partidas reales, no contra un bot.
+
+**Registro de partidas, con tu permiso:** en la pantalla de inicio puedes aceptar compartir tus partidas. Se envía un resumen anónimo (oleadas, torres, órdenes, errores de JavaScript), sin cookies ni datos personales, y se borra a los 12 meses. Sirve para medir dónde se atasca la gente. Sin aceptar, no se envía nada.
+
+## Versión 1.0
+
+Sale de beta el 14-11-2026, con el alcance congelado: lo que no está aquí es otro proyecto.
+
+- Puntaje local con resumen al final y mejor puntaje en el inicio.
+- Oleada 20 especial: 24 tanques, 28 drones FPV y 22 de ala delta, todos con veteranía 3.
+- Dos consejos para el primer minuto: poner una torre y evolucionarla.
+- Registro de partidas con permiso y repetición exacta en el simulador.
+
+### Problemas y comportamientos conocidos
+
+- **Zona muerta de la ametralladora:** los soldados pegados al anillo de sacos quedan más cerca del centro que la punta del cañón, y las balas no les pegan. Se deja así: un arma montada en altura no baja el cañón hasta su base, y premia a la infantería que llega a la torre para lanzarle granadas.
+- **Puntaje en el teléfono horizontal:** el contador baja a una segunda línea del HUD.
+- **El balance se mide con partidas reales:** si los datos muestran un muro en alguna oleada, habrá un ajuste en una versión 1.0.x.
 
 ## Arquitectura
 

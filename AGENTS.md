@@ -44,6 +44,8 @@ Detalle y razones en `docs/architecture.md` (ADR 002). En resumen:
 | `node scripts/export-public.mjs <carpeta> --url=<enlace>` | Copia limpia para publicar (D-3): sin los modelos que no se publican, con el workflow de GitHub Pages. No publica nada | Solo con la confirmación de Ricardo (T15) |
 | `npm run registro` | Informe por oleada de la última partida jugada en local (`logs/`, spec 002): destruidos y que pasaron por tipo, daño por munición y blindaje, puntería, economía y acciones | Para medir el balance con partidas reales |
 | `npm run simulate` | Juega las 10 oleadas sin pantalla con estrategias fijas y muestra vidas, créditos y aciertos | Al tocar combate, economía u oleadas |
+| `npm run simulate -- --repetir <registros…>` | Repite sin pantalla partidas grabadas (semilla y órdenes con su paso) y compara oleada, vidas y, oleada por oleada, créditos y daño (spec 003, M2) | Al tocar el núcleo: una partida que deja de repetirse indica que el juego cambió |
+| `node scripts/record-replays.mjs [--partidas=5]` | Graba partidas en Chrome por la vía del jugador (`__game.order`), a x1, x2 y x3, y deja los registros en `logs/` | Para probar la repetición con partidas nuevas |
 | `npm run assets:import -- <glb> <id>` | Copia a `assets/source/` un modelo generado con TRELLIS, con su textura en PNG | Antes de escribir el manifiesto de un modelo generado con IA |
 | `npm run assets:normalize` | Convierte los modelos de `assets/source/` al estándar según su manifiesto (los de IA, partidos por volúmenes) | Al agregar o cambiar un modelo |
 | `npm run assets:inspect -- archivo.glb` | Muestra la jerarquía y las medidas de un modelo | Al escribir un manifiesto |
@@ -51,7 +53,7 @@ Detalle y razones en `docs/architecture.md` (ADR 002). En resumen:
 
 Laboratorios (solo en `npm run dev`): `/tools/labs/rig-viewer.html` (modelos normalizados, con la dirección de cada cañón), `/tools/labs/vehicle-lab.html` y `/tools/labs/preview.html`.
 
-**Gancho para agentes.** En `npm run dev` existe `window.__game` con `state`, `core` (`placeTower`, `startWave`, `upgradeTower`, `upgradeTowerDefense`, `sellTower`, `clearCover`, `resetWave`, `resetAll`), `renderers`, `camera`, `setMuted(true)`, `setSpeed(n)`, `setPaused(bool)` y `closeStartScreen()` (la pantalla de inicio pausa la simulación). Permite manejar y medir el juego sin depender del mouse ni de una persona. No existe en el build de producción.
+**Gancho para agentes.** En `npm run dev` existe `window.__game` con `state`, `order` (una orden del jugador por `applyOrder`, que queda en el registro), `core` (`placeTower`, `startWave`, `upgradeTower`, `upgradeTowerDefense`, `sellTower`, `clearCover`, `resetWave`, `resetAll`), `renderers`, `camera`, `setMuted(true)`, `setSpeed(n)`, `setPaused(bool)` y `closeStartScreen()` (la pantalla de inicio pausa la simulación). Permite manejar y medir el juego sin depender del mouse ni de una persona. No existe en el build de producción.
 
 ## Definición de terminado
 

@@ -70,6 +70,8 @@ export function createInitialState(config) {
     trees: createCover(config, config.mapDefinition.trees, 'tree', GAMEPLAY_CONFIG.trees),
     bushes: createCover(config, config.mapDefinition.bushes, 'bush', GAMEPLAY_CONFIG.bushes),
     combatRandomSeed: 0,
+    // Segundos de simulación de la oleada en curso: el puntaje premia terminarla rápido.
+    waveSeconds: 0,
     enemies: [],
     // Las zonas que arden tras un impacto incendiario.
     fireZones: [],
@@ -141,6 +143,7 @@ export function resetWave(state, snapshot = state.waveSnapshot) {
   state.spawnGaps = {};
   state.spawnedThisWave = 0;
   state.leakedTeams = [];
+  state.waveSeconds = 0;
   state.activeWaveDefinition = null;
   state.waveActive = false;
   state.waveCountdown = snapshot.wave === 0 ? GAMEPLAY_CONFIG.waves.countdown.firstSeconds : GAMEPLAY_CONFIG.waves.countdown.betweenSeconds;

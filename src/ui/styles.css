@@ -1792,3 +1792,79 @@ body.overlay-active #panel {
 .start-box::-webkit-scrollbar-track { background: #13213a; border-radius: 10px; }
 .start-box::-webkit-scrollbar-thumb { background: #2f4b78; border-radius: 10px; border: 2px solid #13213a; }
 .start-box::-webkit-scrollbar-thumb:hover { background: #4ade80; }
+
+/* Consejos del primer minuto (spec 003, M3). */
+#first-hint {
+  position: absolute;
+  top: 84px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 19;
+  max-width: min(460px, calc(100% - 32px));
+  background: #0d1c2e;
+  border: 1px solid var(--ui-frame);
+  border-left: 4px solid #facc15;
+  border-radius: 12px;
+  padding: 10px 40px 10px 14px;
+  color: #eef4fa;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+#first-hint[hidden] {
+  display: none;
+}
+
+#first-hint p {
+  margin: 0;
+}
+
+#first-hint-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+#first-hint-close:hover {
+  color: #fff;
+}
+
+body.start-active #first-hint,
+body.overlay-active #first-hint {
+  display: none;
+}
+
+@media (max-height: 520px) {
+  #first-hint {
+    top: 52px;
+    font-size: 12px;
+  }
+}
+
+/* Puntaje local (spec 003, S1). */
+.hud-score { position: relative; }
+#score-pops { position: absolute; left: 100%; top: -2px; pointer-events: none; }
+.score-pop { position: absolute; left: 4px; white-space: nowrap; font-size: 13px; font-weight: 800; animation: score-pop 1.2s ease-out forwards; }
+.score-pop.up { color: #4ade80; }
+.score-pop.down { color: #f87171; }
+@keyframes score-pop { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(18px); } }
+
+.score-summary { list-style: none; margin: 4px 0 14px; padding: 10px 16px; min-width: 280px; background: rgba(13, 28, 46, .9); border: 1px solid var(--ui-frame); border-radius: 12px; font-size: 14px; }
+.score-summary[hidden] { display: none; }
+.score-summary li { display: flex; justify-content: space-between; gap: 24px; padding: 2px 0; }
+.score-summary .score-total { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(146, 178, 208, .3); font-size: 16px; font-weight: 800; color: #facc15; }
+.score-summary .score-best { color: #4ade80; font-weight: 700; justify-content: center; }
+
+.start-best { margin-top: 10px; font-size: 14px; font-weight: 700; color: #facc15; }
+.start-best[hidden] { display: none; }
+
+@media (max-height: 520px) { .score-summary { font-size: 12px; padding: 6px 12px; margin-bottom: 8px; } }

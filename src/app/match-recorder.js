@@ -7,10 +7,17 @@
 // logs/partida-<inicio>.json (tools/match-log/vite-plugin.mjs), cuando el juego se sirve desde este
 // computador o la red local. Publicado, solo lo manda a `remoteUrl` (VITE_REGISTRO_URL al construir)
 // y solo si el jugador acepta en la pantalla de inicio; sin esa dirección, no manda nada.
+//
+// También guarda la semilla y las órdenes aceptadas con su paso de simulación (suficiente para
+// reproducir la partida), los errores de JavaScript (máx. 20, 300 caracteres c/u) y los datos del
+// primer minuto: si es la primera partida en este navegador (bandera en localStorage, sin cookies
+// ni datos personales), los segundos de simulación hasta la primera torre, si se abrió la ayuda y
+// la oleada de la primera mejora de ataque.
 
 const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[?::1\]?|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)$/;
 
 const KEEPALIVE_LIMIT = 60 * 1024;
+export const FIRST_MATCH_KEY = 'iron-bastion:jugo';
 const now = () => performance.now() / 1000;
 const round = (value) => Math.round(value * 100) / 100;
 
@@ -40,33 +47,61 @@ function emptyWave(effect, towers, startedAt) {
   };
 }
 
-export function createMatchRecorder({ location = window.location, send = null, remoteUrl = import.meta.env?.VITE_REGISTRO_URL ?? null } = {}) {
+export function createMatchRecorder({ location = window.location, send = null, remoteUrl = import.meta.env?.VITE_REGISTRO_URL ?? null, storage = globalThis.localStorage ?? null, seed = null, fixedStep = null } = {}) {
   const local = LOCAL_HOST.test(location.hostname);
   // Fuera de este computador, solo con dirección remota y con el permiso del jugador (setEnabled).
   const remote = !local && remoteUrl ? remoteUrl : null;
   let enabled = local;
   let match = null;
   let wave = null;
+  let steps = 0;
   const enemies = new Map();
+  const safeSet = (key, value) => { try { storage?.setItem(key, value); } catch { /* ignore */ } };
 
   const post = send ?? ((log) => {
     const body = JSON.stringify(log);
-    fetch(remote ?? new URL('__registro', document.baseURI), {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body,
-      // keepalive deja terminar el envío si se cierra la página, pero el navegador rechaza más de 64 KB.
-      keepalive: body.length < KEEPALIVE_LIMIT,
-    }).catch((error) => console.warn('No se pudo guardar el registro de partida:', error));
+    const url = remote ?? new URL('__registro', document.baseURI);
+    const headers = { 'content-type': 'application/json' };
+    (async () => {
+      if (remote) {
+        const hash = await globalThis.crypto.subtle.digest('SHA-256', new TextEncoder().encode(body));
+        headers['x-amz-content-sha256'] = Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, '0')).join('');
+      }
+      await fetch(url, {
+        method: 'POST',
+        headers,
+        body,
+        // keepalive deja terminar el envío si se cierra la página, pero el navegador rechaza más de 64 KB.
+        keepalive: body.length < KEEPALIVE_LIMIT,
+      });
+    })().catch((error) => console.warn('No se pudo guardar el registro de partida:', error));
   });
 
   function startMatch() {
     const started = new Date();
+    steps = 0;
+    let primeraPartida = null;
+    if (storage) {
+      try { primeraPartida = storage.getItem(FIRST_MATCH_KEY) == null; } catch { primeraPartida = null; }
+    }
     match = {
-      formato: 1,
+      formato: 2,
       id: started.toISOString().replace(/[:.]/g, '-').slice(0, 19),
       inicio: started.toISOString(),
       t0: now(),
+      clave: globalThis.crypto?.randomUUID?.() ?? null,
+      semilla: seed,
+      pasoFijo: fixedStep,
+      ordenes: [],
+      errores: [],
+      erroresOmitidos: 0,
+      modoDesarrollo: false,
+      primerMinuto: {
+        primeraPartida,
+        segundosHastaPrimeraTorre: null,
+        ayudaAbierta: false,
+        primeraMejora: null,
+      },
       oleadas: [],
       acciones: [],
       resultado: null,
@@ -95,12 +130,22 @@ export function createMatchRecorder({ location = window.location, send = null, r
   function save() {
     if (!enabled || !match || match.oleadas.length === 0) return;
     const { t0, ...log } = match;
+    log.pasos = steps;
     post(log);
   }
 
   function note(action, details = {}) {
     if (!match) startMatch();
     match.acciones.push({ t: elapsed(), antesDeOleada: (match.oleadas.at(-1)?.oleada ?? 0) + (wave ? 0 : 1), accion: action, ...details });
+  }
+
+  function recordError(message) {
+    if (!match) startMatch();
+    if (match.errores.length < 20) {
+      match.errores.push({ paso: steps, mensaje: String(message).slice(0, 300) });
+    } else {
+      match.erroresOmitidos += 1;
+    }
   }
 
   return {
@@ -118,6 +163,41 @@ export function createMatchRecorder({ location = window.location, send = null, r
     },
 
     note,
+
+    tick() {
+      if (!match) startMatch();
+      steps += 1;
+    },
+
+    /**
+     * Orden del jugador aceptada por el núcleo (solo se llama en éxito).
+     * Tipos: 'torre' { torre, celda }, 'ataque' { celda }, 'blindaje' { celda },
+     * 'vender' { celda }, 'despejar' { celda }, 'oleada' {}, 'reintentar' {}.
+     */
+    order(state, type, details = {}) {
+      if (!match) startMatch();
+      match.ordenes.push({ paso: steps, tipo: type, ...details });
+      if (state?.developerMode?.enabled) match.modoDesarrollo = true;
+      if (type === 'torre' && match.primerMinuto.segundosHastaPrimeraTorre === null) {
+        match.primerMinuto.segundosHastaPrimeraTorre = fixedStep != null ? round(steps * fixedStep) : null;
+      }
+      if (type === 'ataque' && match.primerMinuto.primeraMejora === null) {
+        match.primerMinuto.primeraMejora = { oleada: state.wave, durante: Boolean(state.waveActive) };
+      }
+      if (match.ordenes.length === 1) safeSet(FIRST_MATCH_KEY, '1');
+    },
+
+    noteHelpOpened() {
+      if (!match) startMatch();
+      match.primerMinuto.ayudaAbierta = true;
+    },
+
+    recordError,
+
+    listenForErrors(target) {
+      target.addEventListener('error', (event) => recordError(event?.message || event?.error?.message || 'error'));
+      target.addEventListener('unhandledrejection', (event) => recordError(event?.reason?.message ?? String(event?.reason)));
+    },
 
     handleEffects(effects, state) {
       currentState = state;
@@ -271,7 +351,7 @@ export function createMatchRecorder({ location = window.location, send = null, r
               wave.creditosFin = effect.credits;
               wave = null;
             }
-            match.resultado = { victoria: effect.victory, oleada: effect.wave, vidas: effect.lives, creditos: effect.credits, segundos: elapsed() };
+            match.resultado = { victoria: effect.victory, oleada: effect.wave, vidas: effect.lives, creditos: effect.credits, segundos: elapsed(), pasos: steps };
             save();
             break;
           default:
