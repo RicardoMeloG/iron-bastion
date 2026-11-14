@@ -128,8 +128,11 @@ export const RENDERING_CONFIG = {
       flameCount: 7,
       flameSpread: 0.2,
       flameLift: 3,
-      smokeEvery: 0.14,
-      smoke: { radius: 0.05, segments: 7, color: 0x3a3836, opacity: 0.5, lifetime: 1.6, upwardSpeed: 0.35, growthRate: 0.9 },
+      // Más seguido, más alto y más denso: una columna, no bocanadas sueltas (Ricardo, 14-11-2026).
+      // El crecimiento es exponencial (escala × e^(growthRate × segundos)): 0,6 en 3 s da unas 6 veces;
+      // 1,5 en 3 s daba 90 y tapaba el mapa.
+      smokeEvery: 0.08,
+      smoke: { radius: 0.06, segments: 7, color: 0x262422, opacity: 0.66, lifetime: 3, upwardSpeed: 0.6, growthRate: 0.6 },
       sinkSeconds: 1,
     },
     turretAnimation: {
@@ -201,6 +204,10 @@ export const RENDERING_CONFIG = {
       flameSpreadDamaged: 0.07,
       flameLift: 8,
       smokeColor: 0x3f4650,
+      // La columna de humo de una torre dañada o destruida (Ricardo, 14-11-2026): bocanadas que suben
+      // `height` (en tamaños de torre) en `seconds`, crecen de `startSize` a `endSize`, se inclinan `lean`
+      // con el viento y pasan de `colorDark` a `colorLight`.
+      plume: { puffs: 20, seconds: 3.6, height: 3.2, startSize: 0.35, endSize: 2.3, lean: 0.7, wobble: 0.18, opacity: 0.92, colorDark: 0x141312, colorLight: 0x4d4a47 },
       fireBaseHeight: 0.46,
       smokeBaseHeight: 0.58,
     },
@@ -229,7 +236,9 @@ export const RENDERING_CONFIG = {
     // Flecha sobre la torre cuando alcanza el dinero para evolucionar su ataque: titila para que
     // se note (un tester llegó a la oleada 18 sin evolucionar ninguna). Medidas en celdas, sobre
     // lo más alto del modelo; `blinkHz`, parpadeos por segundo; la opacidad va de `minOpacity` a 1.
-    upgradeBadge: { size: 0.6, yMargin: 0.55, blinkHz: 1.6, minOpacity: 0.25, color: '#22c55e', renderOrder: 1430 },
+    // Un punto chico en una esquina, no un botón: la flecha grande daba a entender que se evolucionaba
+    // haciéndole clic (Ricardo, 14-11-2026). `corner`: desplazamiento en celdas hacia una esquina.
+    upgradeBadge: { size: 0.34, yMargin: 0.2, corner: 0.34, blinkHz: 1.6, minOpacity: 0.35, color: '#4ade80', renderOrder: 1430 },
   },
 };
 

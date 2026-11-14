@@ -174,11 +174,17 @@ function raiseVeterancy(state, enemy) {
 
 /**
  * Quien destruye una torre gana un nivel de veteranía. Entre soldados, lo gana su unidad entera, y
- * uno más toma un lanzamisiles: quien la destruyó, si aún no lo tenía.
+ * uno más toma un lanzamisiles: quien la destruyó, si aún no lo tenía. Un vehículo sube como máximo
+ * un nivel por oleada destruyendo torres: dos tanques que ganaban un nivel por torre llegaban a la
+ * defensa activa completa e interceptaban todos los misiles (Ricardo, 14-11-2026).
  */
-function promoteEnemy(state, enemy) {
+export function promoteEnemy(state, enemy) {
   if (!enemy.alive || enemy.flying || enemy.veterancy >= VETERANCY.odds[0].chances.length - 1) return;
   const onFoot = getEnemyDefinition(state, enemy.enemyTypeId).locomotion === 'foot';
+  if (!onFoot) {
+    if (enemy.promotedInWave === state.wave) return;
+    enemy.promotedInWave = state.wave;
+  }
   const team = enemy.teamId ? state.enemies.filter((other) => other.alive && other.teamId === enemy.teamId) : [enemy];
   const armed = onFoot ? [enemy, ...team].find((soldier) => soldier.enemyTypeId !== TEAMS.rear) : null;
   if (armed) armed.enemyTypeId = TEAMS.rear;

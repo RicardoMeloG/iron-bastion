@@ -1768,3 +1768,27 @@ body.overlay-active #panel {
 @media (hover: none) and (pointer: coarse) {
   .pause-key { display: none; }
 }
+
+/* Ajustes de sonido (14-11-2026): engranaje junto al botón de sonido; el panel se abre al pasar
+   el mouse o al tocarlo, por encima del resto del HUD. */
+.sound-settings { position: relative; display: inline-flex; }
+.sound-gear { padding: 8px 9px; display: inline-flex; align-items: center; justify-content: center; }
+/* Sin el hueco del ícono que llevan los demás botones: el engranaje ya es su ícono. */
+.sound-gear::before { display: none; }
+.sound-panel {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 60;
+  display: none; flex-direction: column; gap: 10px; min-width: 220px; padding: 12px 14px;
+  background: #13213a; border: 1px solid #2f4b78; border-radius: 10px; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  color: #e2e8f0; font-size: 13px; font-weight: 700;
+}
+.sound-settings:hover .sound-panel, .sound-settings:focus-within .sound-panel, .sound-settings.open .sound-panel { display: flex; }
+.sound-panel label { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sound-panel input[type='range'] { width: 120px; accent-color: #4ade80; cursor: pointer; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* La barra de desplazamiento de la ayuda, con los colores del juego en vez de la del sistema. */
+.start-box { scrollbar-width: thin; scrollbar-color: #2f4b78 #13213a; }
+.start-box::-webkit-scrollbar { width: 10px; }
+.start-box::-webkit-scrollbar-track { background: #13213a; border-radius: 10px; }
+.start-box::-webkit-scrollbar-thumb { background: #2f4b78; border-radius: 10px; border: 2px solid #13213a; }
+.start-box::-webkit-scrollbar-thumb:hover { background: #4ade80; }

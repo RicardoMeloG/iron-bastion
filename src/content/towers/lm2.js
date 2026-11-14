@@ -20,7 +20,7 @@ export const lm2TowerDefinition = {
     default: 'armored',
   },
   economy: {
-    baseCost: 150,
+    baseCost: 135,
     sellRatio: 0.6,
     // Vender una torre destruida no puede ser una reparación barata.
     destroyedSellRatio: 0.25,
@@ -90,10 +90,10 @@ export const lm2TowerDefinition = {
     // Cada nivel rinde más por crédito que poner torres básicas (tools/balance/level-value.mjs).
     // La recarga es larga a propósito: de frente, un tanque veterano aguanta a una sola LM-2 hasta el nivel 5
     // (Ricardo, 07-11-2026). Con la mitad, una de nivel 3 lo destruía en 10 s.
-    level({ label: 'Lanzador doble', magazine: 2, damage: 55, salvoInterval: 0.45, reload: 9, range: 4.2, scale: 1, upgradeCost: 130 }),
-    level({ label: 'Lanzador triple', magazine: 3, damage: 75, salvoInterval: 0.42, reload: 6.6, range: 4.4, scale: 1.04, upgradeCost: 200 }),
-    level({ label: 'Lanzador cuádruple', magazine: 4, damage: 92, salvoInterval: 0.4, reload: 6, range: 4.6, scale: 1.08, upgradeCost: 300 }),
-    level({ label: 'Lanzador quíntuple', magazine: 5, damage: 118, salvoInterval: 0.38, reload: 5.2, range: 4.8, scale: 1.12, upgradeCost: 440 }),
+    level({ label: 'Lanzador doble', magazine: 2, damage: 55, salvoInterval: 0.45, reload: 9, range: 4.2, scale: 1, upgradeCost: 115 }),
+    level({ label: 'Lanzador triple', magazine: 3, damage: 75, salvoInterval: 0.42, reload: 6.6, range: 4.4, scale: 1.04, upgradeCost: 180 }),
+    level({ label: 'Lanzador cuádruple', magazine: 4, damage: 92, salvoInterval: 0.4, reload: 6, range: 4.6, scale: 1.08, upgradeCost: 270 }),
+    level({ label: 'Lanzador quíntuple', magazine: 5, damage: 118, salvoInterval: 0.38, reload: 5.2, range: 4.8, scale: 1.12, upgradeCost: 395 }),
     level({ label: 'Lanzador séxtuple', magazine: 6, damage: 150, salvoInterval: 0.35, reload: 4.6, range: 5, scale: 1.16, upgradeCost: null }),
   ],
 };

@@ -11,7 +11,7 @@ export const aa3TowerDefinition = {
     default: 'nearest',
   },
   economy: {
-    baseCost: 110,
+    baseCost: 100,
     sellRatio: 0.6,
     destroyedSellRatio: 0.25,
   },
@@ -71,10 +71,10 @@ export const aa3TowerDefinition = {
     },
   ],
   levels: [
-    { label: 'Cañón simple', damage: 6, rate: 3, range: 5, scale: 1, upgradeCost: 110 },
-    { label: 'Cañón doble', damage: 9, rate: 3.5, range: 5.4, scale: 1.04, upgradeCost: 190 },
-    { label: 'Cuádruple cañón', damage: 13, rate: 4.5, range: 5.8, scale: 1.08, upgradeCost: 300 },
-    { label: 'Cuádruple reforzado', damage: 18, rate: 5.5, range: 6.2, scale: 1.12, upgradeCost: 450 },
+    { label: 'Cañón simple', damage: 6, rate: 3, range: 5, scale: 1, upgradeCost: 100 },
+    { label: 'Cañón doble', damage: 9, rate: 3.5, range: 5.4, scale: 1.04, upgradeCost: 170 },
+    { label: 'Cuádruple cañón', damage: 13, rate: 4.5, range: 5.8, scale: 1.08, upgradeCost: 270 },
+    { label: 'Cuádruple reforzado', damage: 18, rate: 5.5, range: 6.2, scale: 1.12, upgradeCost: 405 },
     { label: 'Cuádruple pesado', damage: 24, rate: 7, range: 6.5, scale: 1.16, upgradeCost: null },
   ],
 };

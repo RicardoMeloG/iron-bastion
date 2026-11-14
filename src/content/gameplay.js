@@ -103,13 +103,15 @@ export const GAMEPLAY_CONFIG = {
       { 'infantry-mg': 15, 'moto-recon': 4, patrulla: 13, 'truck-transport': 2, 'dron-fpv': 1 },
       { 'infantry-mg': 15, 'moto-recon': 5, patrulla: 13, 'apc-8x8': 3, 'truck-transport': 2, 'dron-fpv': 2 },
       { 'infantry-mg': 12, 'moto-recon': 5, patrulla: 13, 'apc-8x8': 2, 'truck-transport': 3, 'dron-fpv': 2 },
-      { 'infantry-mg': 18, 'moto-recon': 6, patrulla: 7, 'apc-8x8': 2, 'truck-transport': 4, 'tank-heavy': 2, 'dron-fpv': 2 },
+      { 'infantry-mg': 18, 'moto-recon': 6, patrulla: 7, 'apc-8x8': 2, 'truck-transport': 4, 'dron-fpv': 2 },
+      // Los tanques: el primero en la 11 y de a uno, de a dos de la 13 a la 15 (Ricardo, 14-11-2026:
+      // con dos desde la 10 se volvían veteranos destruyendo torres y no se pasaba de la 15).
       // Desde la 11, drones: primero los FPV, que van a las torres, y desde la 14 los de ala delta, a la base.
-      { 'infantry-mg': 45, 'moto-recon': 3, patrulla: 7, 'apc-8x8': 1, 'truck-transport': 2, 'tank-heavy': 2, 'dron-fpv': 2 },
-      { 'infantry-mg': 39, 'moto-recon': 4, patrulla: 10, 'apc-8x8': 2, 'truck-transport': 2, 'tank-heavy': 2, 'dron-fpv': 3 },
+      { 'infantry-mg': 45, 'moto-recon': 3, patrulla: 7, 'apc-8x8': 1, 'truck-transport': 2, 'tank-heavy': 1, 'dron-fpv': 2 },
+      { 'infantry-mg': 39, 'moto-recon': 4, patrulla: 10, 'apc-8x8': 2, 'truck-transport': 2, 'tank-heavy': 1, 'dron-fpv': 3 },
       { 'infantry-mg': 39, 'moto-recon': 4, patrulla: 10, 'apc-8x8': 2, 'truck-transport': 3, 'tank-heavy': 2, 'dron-fpv': 3 },
-      { 'infantry-mg': 39, 'moto-recon': 5, patrulla: 11, 'apc-8x8': 2, 'truck-transport': 3, 'tank-heavy': 3, 'dron-fpv': 4, 'dron-ala': 2 },
-      { 'infantry-mg': 39, 'moto-recon': 6, patrulla: 13, 'apc-8x8': 3, 'truck-transport': 4, 'tank-heavy': 3, 'dron-fpv': 5, 'dron-ala': 2 },
+      { 'infantry-mg': 39, 'moto-recon': 5, patrulla: 11, 'apc-8x8': 2, 'truck-transport': 3, 'tank-heavy': 2, 'dron-fpv': 4, 'dron-ala': 2 },
+      { 'infantry-mg': 39, 'moto-recon': 6, patrulla: 13, 'apc-8x8': 3, 'truck-transport': 4, 'tank-heavy': 2, 'dron-fpv': 5, 'dron-ala': 2 },
       { 'infantry-mg': 45, 'moto-recon': 7, patrulla: 14, 'apc-8x8': 3, 'truck-transport': 5, 'tank-heavy': 3, 'dron-fpv': 6, 'dron-ala': 2 },
       { 'infantry-mg': 54, 'moto-recon': 7, patrulla: 15, 'apc-8x8': 3, 'truck-transport': 6, 'tank-heavy': 3, 'dron-fpv': 7, 'dron-ala': 3 },
       { 'infantry-mg': 63, 'moto-recon': 9, patrulla: 16, 'apc-8x8': 4, 'truck-transport': 6, 'tank-heavy': 4, 'dron-fpv': 8, 'dron-ala': 4 },

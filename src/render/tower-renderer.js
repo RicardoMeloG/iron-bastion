@@ -92,19 +92,15 @@ function buildDamageFxGroup(definition, level) {
     flames.push(flame);
   }
 
-  for (let i = 0; i < 4; i += 1) {
-    const smoke = mk(
-      new THREE.SphereGeometry(0.045 * s * (1 + i * 0.16), 8, 8),
-      new THREE.MeshBasicMaterial({
-        color: dmg.smokeColor,
-        transparent: true,
-        opacity: 0.32,
-        depthWrite: false,
-      }),
-    );
-    smoke.position.set((-0.06 + i * 0.04) * s, (dmg.smokeBaseHeight + i * 0.07) * s, (-0.02 + i * 0.015) * s);
-    smoke.userData.baseY = smoke.position.y;
-    smoke.userData.baseX = smoke.position.x;
+  // Columna de humo (Ricardo, 14-11-2026): bocanadas que suben, crecen, se inclinan con el viento y se
+  // aclaran hasta desaparecer, escalonadas en el tiempo para que la columna nunca se corte.
+  const plume = dmg.plume;
+  for (let i = 0; i < plume.puffs; i += 1) {
+    const smoke = new THREE.Sprite(new THREE.SpriteMaterial({ map: getSmokePuffTexture(), color: plume.colorDark, transparent: true, opacity: 0, depthWrite: false }));
+    smoke.userData.phase = i / plume.puffs;
+    smoke.userData.jitter = Math.sin(i * 12.9898) * 0.5;
+    smoke.userData.towerSize = s;
+    smoke.renderOrder = 900;
     group.add(smoke);
     smokes.push(smoke);
   }
@@ -161,9 +157,9 @@ function buildTowerHpBar(definition, level, worldScale) {
   };
 }
 
-// La flecha de «se puede evolucionar»: un círculo verde con una flecha hacia arriba, dibujado una
-// vez en un lienzo y compartido por todas las torres (cada una lleva su propio material para
-// titilar a su ritmo sin afectar a las demás).
+// El aviso de «se puede evolucionar»: un punto verde con un halo suave, dibujado una vez en un lienzo
+// y compartido por todas las torres (cada una lleva su propio material para titilar a su ritmo sin
+// afectar a las demás). Va en una esquina de la torre y no parece un botón.
 let upgradeBadgeTexture = null;
 function getUpgradeBadgeTexture() {
   if (upgradeBadgeTexture) return upgradeBadgeTexture;
@@ -171,34 +167,48 @@ function getUpgradeBadgeTexture() {
   canvas.width = 128;
   canvas.height = 128;
   const context = canvas.getContext('2d');
-  context.fillStyle = TWR.upgradeBadge.color;
-  context.strokeStyle = '#0b1626';
-  context.lineWidth = 8;
+  const halo = context.createRadialGradient(64, 64, 10, 64, 64, 62);
+  halo.addColorStop(0, TWR.upgradeBadge.color);
+  halo.addColorStop(0.45, `${TWR.upgradeBadge.color}88`);
+  halo.addColorStop(1, `${TWR.upgradeBadge.color}00`);
+  context.fillStyle = halo;
+  context.fillRect(0, 0, 128, 128);
+  context.fillStyle = '#d9ffe6';
   context.beginPath();
-  context.arc(64, 64, 58, 0, Math.PI * 2);
+  context.arc(64, 64, 16, 0, Math.PI * 2);
   context.fill();
-  context.stroke();
-  context.strokeStyle = '#ffffff';
-  context.lineWidth = 16;
-  context.lineCap = 'round';
-  context.lineJoin = 'round';
-  context.beginPath();
-  context.moveTo(36, 72);
-  context.lineTo(64, 40);
-  context.lineTo(92, 72);
-  context.moveTo(64, 42);
-  context.lineTo(64, 96);
-  context.stroke();
   upgradeBadgeTexture = new THREE.CanvasTexture(canvas);
   upgradeBadgeTexture.colorSpace = THREE.SRGBColorSpace;
   return upgradeBadgeTexture;
 }
 
+// Una bocanada de humo: un disco con borde difuso, dibujado una vez y compartido por todas las torres.
+let smokePuffTexture = null;
+function getSmokePuffTexture() {
+  if (smokePuffTexture) return smokePuffTexture;
+  const canvas = document.createElement('canvas');
+  canvas.width = 64;
+  canvas.height = 64;
+  const context = canvas.getContext('2d');
+  const soft = context.createRadialGradient(32, 32, 4, 32, 32, 31);
+  soft.addColorStop(0, 'rgba(255,255,255,0.95)');
+  soft.addColorStop(0.55, 'rgba(255,255,255,0.55)');
+  soft.addColorStop(1, 'rgba(255,255,255,0)');
+  context.fillStyle = soft;
+  context.fillRect(0, 0, 64, 64);
+  smokePuffTexture = new THREE.CanvasTexture(canvas);
+  smokePuffTexture.colorSpace = THREE.SRGBColorSpace;
+  return smokePuffTexture;
+}
+
+const plumeDark = new THREE.Color()
+const plumeLight = new THREE.Color()
+
 function buildUpgradeBadge(definition, level, worldScale) {
   const cfg = TWR.upgradeBadge;
   const badge = new THREE.Sprite(new THREE.SpriteMaterial({ map: getUpgradeBadgeTexture(), transparent: true, depthTest: false, depthWrite: false }));
   const height = rigDefinitions[definition.model.rigs[level]].height * getTowerSize(definition, level);
-  badge.position.y = (height + cfg.yMargin) * worldScale;
+  badge.position.set(cfg.corner * worldScale, (height + cfg.yMargin) * worldScale, cfg.corner * worldScale);
   badge.scale.setScalar(cfg.size * worldScale);
   badge.renderOrder = cfg.renderOrder;
   badge.visible = false;
@@ -216,6 +226,9 @@ export function canAffordUpgrade(state, tower, definition) {
 function removeTowerEntry(scene, entry) {
   scene.remove(entry.root);
   disposeOwnedMeshes(entry.damageFx);
+  // Las bocanadas de humo son sprites, que disposeOwnedMeshes no recorre: cada una tiene su material
+  // (opacidad y color propios); la textura es compartida y no se libera (auditoría, 14-11-2026).
+  for (const smoke of entry.damageFx.userData.smokes ?? []) smoke.material.dispose();
   disposeOwnedMeshes(entry.hpBar.group);
   entry.upgradeBadge.material.dispose();
 }
@@ -403,18 +416,28 @@ export class TowerRenderer {
           flame.userData.strength = showWreck ? 1 : dmg.flameStrength;
           flame.scale.setScalar(flame.userData.sizeFactor * (showWreck ? dmg.flameSizeDestroyed : dmg.flameSize));
         }
+        const plume = TWR.damageState.plume;
+        plumeDark.setHex(plume.colorDark);
+        plumeLight.setHex(plume.colorLight);
+        // Destruida: columna alta y densa. Dañada: un hilo más bajo, con la mitad de las bocanadas.
+        const height = showWreck ? plume.height : plume.height * 0.5;
         for (let index = 0; index < smokes.length; index += 1) {
           const smoke = smokes[index];
-          const drift = Math.sin(elapsedTime * (1.8 + index * 0.22) + index);
-          smoke.position.y += showWreck ? 0.0015 : 0.001;
-          smoke.position.x += drift * 0.0002;
-          const fadeBase = showWreck ? 0.42 : 0.3;
-          smoke.material.opacity = fadeBase + Math.sin(elapsedTime * 0.8 + index) * 0.08;
-          const maxY = (smoke.userData.baseY ?? 0.4) + 0.55;
-          if (smoke.position.y > maxY) {
-            smoke.position.y = smoke.userData.baseY ?? 0.4;
-            smoke.position.x = smoke.userData.baseX ?? 0;
-          }
+          const size = smoke.userData.towerSize;
+          smoke.visible = showWreck || index % 2 === 0;
+          // Tiempo, no cuadros: la columna sube igual a 30 o a 120 FPS.
+          const t = (elapsedTime / plume.seconds + smoke.userData.phase) % 1;
+          const lean = t * t * plume.lean;
+          smoke.position.set(
+            (lean + smoke.userData.jitter * plume.wobble * t) * size,
+            (TWR.damageState.smokeBaseHeight + t * height) * size,
+            lean * 0.4 * size,
+          );
+          smoke.scale.setScalar((plume.startSize + t * (plume.endSize - plume.startSize)) * size);
+          // Aparece rápido y se desvanece lento, y se aclara al subir.
+          const fade = Math.min(1, t / 0.12) * (1 - t) ** 1.4;
+          smoke.material.opacity = (showWreck ? plume.opacity : plume.opacity * 0.6) * fade;
+          smoke.material.color.copy(plumeDark).lerp(plumeLight, t);
         }
       }
     }

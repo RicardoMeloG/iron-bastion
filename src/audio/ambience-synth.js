@@ -74,7 +74,8 @@ export class AmbienceSynth {
     this.master = context.createGain();
     this.master.gain.setValueAtTime(0, context.currentTime);
     this.master.gain.linearRampToValueAtTime(AMBIENCE.master, context.currentTime + AMBIENCE.fadeInSeconds);
-    this.master.connect(this.sfxPlayer.output ?? context.destination);
+    // Por el canal de ambiente, para que su volumen lo ajuste el panel de sonido (14-11-2026).
+    this.master.connect(this.sfxPlayer.ambientBus ?? this.sfxPlayer.output ?? context.destination);
     this.wind = createWindBuffer(context, AMBIENCE.bufferSeconds);
     this.createWind(context);
     this.shot = createShotBuffer(context);
@@ -131,7 +132,7 @@ export class AmbienceSynth {
   /** Una explosión a lo lejos: la grabación, baja y con algo de variación. */
   distantBlast() {
     const { volume, rateJitter } = AMBIENCE.distantBlast;
-    this.sfxPlayer.play('explosion-lejana', { volume: volume * (0.5 + Math.random() * 0.5), rateJitter });
+    this.sfxPlayer.play('explosion-lejana', { volume: volume * (0.5 + Math.random() * 0.5), rateJitter, bus: 'ambient' });
   }
 
   /** Una ráfaga corta a lo lejos: golpes apagados, de un costado, y su eco. */

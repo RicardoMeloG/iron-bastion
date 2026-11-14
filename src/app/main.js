@@ -44,6 +44,14 @@ import { createSceneRuntime } from '../render/scene-runtime.js';
 const config = createGameConfig();
 const state = createInitialState(config);
 
+// La ayuda toma los precios y la cantidad de oleadas de la configuración, no de un texto escrito a
+// mano: decía «diez oleadas» y los precios de antes del ajuste de balance (Ricardo, 14-11-2026).
+for (const el of document.querySelectorAll('[data-tower-cost]')) {
+  const cost = config.towerDefinitions[el.dataset.towerCost]?.economy.baseCost;
+  if (cost != null) el.textContent = String(cost);
+}
+for (const el of document.querySelectorAll('[data-wave-total]')) el.textContent = String(config.waveSet.waves.length);
+
 const layoutCoordinator = createLayoutCoordinator(document);
 const fieldEl = document.getElementById('field');
 const startScreenEl = document.getElementById('start-screen');
@@ -428,6 +436,52 @@ try {
 }
 setMuted(savedMute);
 muteButton.addEventListener('click', () => setMuted(!sfxPlayer.muted));
+
+// Ajustes de sonido (pedido de un tester, 14-11-2026): un engranaje junto al botón de sonido; al
+// pasar el mouse (o tocarlo) se abren tres volúmenes: general, ambiente y efectos. Se recuerdan en
+// este navegador (localStorage, sin cookies: es una preferencia que pidió el propio jugador). Subir
+// uno con el sonido apagado lo vuelve a encender.
+const VOLUME_KEY = 'iron-bastion:volumenes';
+const VOLUME_DEFAULTS = { general: 80, ambient: 80, effects: 80 };
+let savedVolumes = { ...VOLUME_DEFAULTS };
+try {
+  const stored = JSON.parse(localStorage.getItem(VOLUME_KEY) ?? 'null');
+  if (stored && typeof stored === 'object') {
+    for (const key of Object.keys(VOLUME_DEFAULTS)) if (Number.isFinite(stored[key])) savedVolumes[key] = stored[key];
+  }
+} catch {
+  savedVolumes = { ...VOLUME_DEFAULTS };
+}
+for (const slider of document.querySelectorAll('[data-volume]')) {
+  const channel = slider.dataset.volume;
+  slider.value = String(savedVolumes[channel]);
+  sfxPlayer.setVolume(channel, savedVolumes[channel] / 100);
+  slider.addEventListener('input', () => {
+    const value = Number(slider.value);
+    savedVolumes[channel] = value;
+    sfxPlayer.setVolume(channel, value / 100);
+    if (value > 0 && sfxPlayer.muted) setMuted(false);
+    try {
+      localStorage.setItem(VOLUME_KEY, JSON.stringify(savedVolumes));
+    } catch {
+      // Sin almacenamiento: los volúmenes duran solo esta visita.
+    }
+  });
+}
+const soundGear = document.getElementById('sound-gear');
+const soundSettings = soundGear?.closest('.sound-settings');
+if (soundGear && soundSettings) {
+  // En pantallas táctiles no hay mouse encima: el toque abre y cierra el panel.
+  soundGear.addEventListener('click', () => {
+    const open = soundSettings.classList.toggle('open');
+    soundGear.setAttribute('aria-expanded', String(open));
+  });
+  soundSettings.addEventListener('mouseenter', () => soundGear.setAttribute('aria-expanded', 'true'));
+  soundSettings.addEventListener('mouseleave', () => {
+    soundSettings.classList.remove('open');
+    soundGear.setAttribute('aria-expanded', 'false');
+  });
+}
 window.addEventListener('keydown', (event) => {
   if (event.target instanceof HTMLInputElement || event.ctrlKey || event.metaKey || event.altKey) return;
   if (event.key === 'm' || event.key === 'M') {

@@ -61,7 +61,7 @@ test('en territorio enemigo no se construye, y ninguna torre alcanza el punto de
 test('la masa crece hasta la oleada 18; el cierre cambia soldados a pie por vehículos y drones', () => {
   const { waves } = defaultWaveSetDefinition;
   const total = (wave) => wave.spawns.reduce((sum, id) => sum + 1 + (GAME_ENEMIES[id].dismount?.length ?? 0), 0);
-  assert.deepEqual(waves.map(total), [9, 12, 18, 25, 34, 41, 55, 62, 65, 77, 80, 82, 89, 97, 111, 129, 148, 168, 162, 154]);
+  assert.deepEqual(waves.map(total), [9, 12, 18, 25, 34, 41, 55, 62, 65, 75, 79, 81, 89, 96, 110, 129, 148, 168, 162, 154]);
   const heavy = (wave) => wave.spawns.filter((id) => !id.startsWith('infantry-')).length;
   assert.ok(heavy(waves[18]) > heavy(waves[17]) && heavy(waves[19]) > heavy(waves[18]), 'la 19 y la 20 traen cada vez más vehículos y drones');
   const tanks = (wave) => wave.spawns.filter((id) => id === 'tank-heavy').length;
@@ -80,7 +80,7 @@ test('cada oleada suma algo: infantería, motos, vehículos, blindados y tanques
   assert.deepEqual([...new Set(waves[0].spawns)].sort(), ['infantry-mg'], 'la primera oleada es solo infantería con fusil');
   assert.deepEqual([
     'infantry-mg', 'moto-recon', 'patrulla', 'truck-transport', 'apc-8x8', 'tank-heavy',
-  ].map(firstWaveWith), [1, 3, 4, 5, 8, 10]);
+  ].map(firstWaveWith), [1, 3, 4, 5, 8, 11]); // el primer tanque, en la 11 y solo (14-11-2026)
   assert.equal(firstWaveWith('dron-fpv'), 7, 'los drones empiezan en la 7');
   // Desde que aparecen, las motos están en todas.
   for (const wave of waves.slice(2)) assert.ok(wave.spawns.includes('moto-recon'), wave.id);

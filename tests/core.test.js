@@ -70,20 +70,22 @@ test('comprar, mejorar y vender torre respeta economia base', () => {
   state.credits = 300;
   const tower = placeTower(state, { towerTypeId: 'mg7-vulcan', gx: 8, gy: 2 });
   assert.ok(tower);
-  assert.equal(state.credits, 240);
+  assert.equal(state.credits, 245);
   assert.equal(upgradeTower(state, tower.id), true);
   assert.equal(tower.level, 1);
-  assert.equal(tower.invested, 150);
-  assert.equal(state.credits, 150);
+  assert.equal(tower.invested, 135);
+  assert.equal(state.credits, 165);
   startWave(state);
   assert.equal(sellTower(state, tower.id), true);
-  assert.equal(state.credits, 240);
+  assert.equal(state.credits, 246);
 });
 
 test('solo alcanza para una torre, y la oleada 1 se puede con ella sin mejorar', () => {
   const state = createInitialState(createGameConfig());
   const { towerDefinitions } = state.config;
-  assert.equal(state.credits, towerDefinitions['mg7-vulcan'].economy.baseCost);
+  // Torres un 10 % más baratas (14-11-2026): el dinero inicial sigue alcanzando para una sola.
+  assert.ok(state.credits >= towerDefinitions['mg7-vulcan'].economy.baseCost);
+  assert.ok(state.credits < 2 * towerDefinitions['mg7-vulcan'].economy.baseCost);
   assert.ok(state.credits < towerDefinitions['lm2-lanza'].economy.baseCost);
   const tower = placeTower(state, { towerTypeId: 'mg7-vulcan', gx: 11, gy: 4 });
   assert.ok(tower);

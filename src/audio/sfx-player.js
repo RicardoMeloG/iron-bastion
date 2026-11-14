@@ -13,6 +13,17 @@ export class SfxPlayer {
     this.activeLoops = new Map();
     this.unlockBound = false;
     this.muted = false;
+    // Volúmenes de 0 a 1 (pedido de un tester, 14-11-2026): el general escala la salida; los efectos
+    // (disparos, explosiones) y el ambiente (los bucles) tienen su propio canal antes del compresor.
+    this.volumes = { general: 1, effects: 1, ambient: 1 };
+  }
+
+  setVolume(channel, volume) {
+    if (!(channel in this.volumes)) return;
+    this.volumes[channel] = Math.min(1, Math.max(0, Number(volume) || 0));
+    if (channel === 'general' && this.master) this.master.gain.value = AUDIO_CONFIG.master.gain * this.volumes.general;
+    if (channel === 'effects' && this.effectsBus) this.effectsBus.gain.value = this.volumes.effects;
+    if (channel === 'ambient' && this.ambientBus) this.ambientBus.gain.value = this.volumes.ambient;
   }
 
   setMuted(muted) {
@@ -51,9 +62,15 @@ export class SfxPlayer {
         compressor.attack.value = attack;
         compressor.release.value = release;
         this.master = this.context.createGain();
-        this.master.gain.value = gain;
+        this.master.gain.value = gain * this.volumes.general;
         compressor.connect(this.master).connect(this.context.destination);
         this.output = compressor;
+        this.effectsBus = this.context.createGain();
+        this.effectsBus.gain.value = this.volumes.effects;
+        this.effectsBus.connect(compressor);
+        this.ambientBus = this.context.createGain();
+        this.ambientBus.gain.value = this.volumes.ambient;
+        this.ambientBus.connect(compressor);
         for (const [id, data] of this.encoded) this.decode(id, data);
         this.encoded.clear();
       }
@@ -113,7 +130,9 @@ export class SfxPlayer {
     gainNode.gain.value = options.volume ?? DEFAULTS.playVolume;
 
     source.connect(gainNode);
-    gainNode.connect(this.output);
+    // Los efectos van por su canal; un sonido del ambiente (una explosión lejana) pide el del ambiente.
+    const bus = options.bus === 'ambient' ? this.ambientBus : this.effectsBus;
+    gainNode.connect(bus ?? this.output);
     source.start();
     return true;
   }
@@ -137,7 +156,7 @@ export class SfxPlayer {
     gainNode.gain.value = options.volume ?? DEFAULTS.loopVolume;
 
     source.connect(gainNode);
-    gainNode.connect(this.output);
+    gainNode.connect(this.ambientBus ?? this.output);
     // Cada bucle empieza en un punto distinto, así dos iguales no suenan en fase.
     source.start(0, Math.random() * buffer.duration);
     this.activeLoops.set(id, { source, gainNode });

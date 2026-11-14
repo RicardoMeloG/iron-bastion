@@ -8,7 +8,7 @@ export const mg7TowerDefinition = {
     default: 'nearest',
   },
   economy: {
-    baseCost: 60,
+    baseCost: 55,
     sellRatio: 0.6,
     // Vender una torre destruida no puede ser una reparación barata.
     destroyedSellRatio: 0.25,
@@ -74,10 +74,10 @@ export const mg7TowerDefinition = {
   ],
   levels: [
     // Cada nivel rinde más por crédito que poner torres básicas (tools/balance/level-value.mjs).
-    { label: 'Cañón simple', damage: 5, rate: 2.5, range: 3.2, scale: 1, upgradeCost: 90 },
-    { label: 'Cañón doble', damage: 8, rate: 4, range: 3.4, scale: 1.04, upgradeCost: 190 },
-    { label: 'Triple cañón', damage: 13, rate: 5.5, range: 3.6, scale: 1.08, upgradeCost: 420 },
-    { label: 'Cuádruple cañón', damage: 22, rate: 7.5, range: 3.9, scale: 1.12, upgradeCost: 630 },
+    { label: 'Cañón simple', damage: 5, rate: 2.5, range: 3.2, scale: 1, upgradeCost: 80 },
+    { label: 'Cañón doble', damage: 8, rate: 4, range: 3.4, scale: 1.04, upgradeCost: 170 },
+    { label: 'Triple cañón', damage: 13, rate: 5.5, range: 3.6, scale: 1.08, upgradeCost: 380 },
+    { label: 'Cuádruple cañón', damage: 22, rate: 7.5, range: 3.9, scale: 1.12, upgradeCost: 565 },
     { label: 'Gatling', damage: 28, rate: 10.5, range: 4.3, scale: 1.16, upgradeCost: null },
   ],
 };

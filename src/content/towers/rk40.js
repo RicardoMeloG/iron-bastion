@@ -22,7 +22,7 @@ export const rk40TowerDefinition = {
     default: 'infantry',
   },
   economy: {
-    baseCost: 140,
+    baseCost: 125,
     sellRatio: 0.6,
     destroyedSellRatio: 0.25,
   },
@@ -80,10 +80,10 @@ export const rk40TowerDefinition = {
     },
   ],
   levels: [
-    level({ label: 'Salva de 4', magazine: 4, damage: 6, burnPerSecond: 8, burnSeconds: 3.5, burnRadius: 0.55, salvoInterval: 0.35, reload: 7, range: 5, scale: 1, upgradeCost: 100 }),
-    level({ label: 'Salva de 6', magazine: 6, damage: 8, burnPerSecond: 10, burnSeconds: 3.5, burnRadius: 0.58, salvoInterval: 0.3, reload: 7, range: 5.2, scale: 1.02, upgradeCost: 180 }),
-    level({ label: 'Salva de 9', magazine: 9, damage: 10, burnPerSecond: 13, burnSeconds: 4, burnRadius: 0.62, salvoInterval: 0.25, reload: 7, range: 5.4, scale: 1.04, upgradeCost: 280 }),
-    level({ label: 'Salva de 12', magazine: 12, damage: 13, burnPerSecond: 16, burnSeconds: 4, burnRadius: 0.66, salvoInterval: 0.22, reload: 7, range: 5.6, scale: 1.06, upgradeCost: 420 }),
+    level({ label: 'Salva de 4', magazine: 4, damage: 6, burnPerSecond: 8, burnSeconds: 3.5, burnRadius: 0.55, salvoInterval: 0.35, reload: 7, range: 5, scale: 1, upgradeCost: 90 }),
+    level({ label: 'Salva de 6', magazine: 6, damage: 8, burnPerSecond: 10, burnSeconds: 3.5, burnRadius: 0.58, salvoInterval: 0.3, reload: 7, range: 5.2, scale: 1.02, upgradeCost: 160 }),
+    level({ label: 'Salva de 9', magazine: 9, damage: 10, burnPerSecond: 13, burnSeconds: 4, burnRadius: 0.62, salvoInterval: 0.25, reload: 7, range: 5.4, scale: 1.04, upgradeCost: 250 }),
+    level({ label: 'Salva de 12', magazine: 12, damage: 13, burnPerSecond: 16, burnSeconds: 4, burnRadius: 0.66, salvoInterval: 0.22, reload: 7, range: 5.6, scale: 1.06, upgradeCost: 380 }),
     level({ label: 'Salva de 16', magazine: 16, damage: 16, burnPerSecond: 20, burnSeconds: 4.5, burnRadius: 0.7, salvoInterval: 0.18, reload: 7, range: 5.8, scale: 1.08, upgradeCost: null }),
   ],
 };
